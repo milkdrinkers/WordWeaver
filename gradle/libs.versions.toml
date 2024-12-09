@@ -1,0 +1,18 @@
+[versions]
+
+[libraries]
+annotations = "org.jetbrains:annotations:26.0.1"
+gson = "com.google.code.gson:gson:2.11.0"
+paper-api = "io.papermc.paper:paper-api:1.17-R0.1-SNAPSHOT"
+spigot-api = "org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT"
+
+# Testing
+junit-bom = "org.junit:junit-bom:5.11.3"
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit-platform = { module = "org.junit.platform:junit-platform-launcher" }
+
+[bundles]
+junit = ["junit-jupiter", "junit-platform"]
+
+[plugins]
+shadow = "com.gradleup.shadow:8.3.5"
