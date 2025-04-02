@@ -1,18 +1,19 @@
 [versions]
+slf4j = "2.0.17"
 
 [libraries]
-annotations = "org.jetbrains:annotations:26.0.1"
+adventure = { module = "net.kyori:adventure-api", version = "4.19.0" }
+annotations = "org.jetbrains:annotations:26.0.2"
 gson = "com.google.code.gson:gson:2.11.0"
-paper-api = "io.papermc.paper:paper-api:1.17-R0.1-SNAPSHOT"
-spigot-api = "org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT"
-
-# Testing
 junit-bom = "org.junit:junit-bom:5.11.3"
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
 junit-platform = { module = "org.junit.platform:junit-platform-launcher" }
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 
 [bundles]
 junit = ["junit-jupiter", "junit-platform"]
 
 [plugins]
+publisher = "com.vanniktech.maven.publish:0.31.0"
 shadow = "com.gradleup.shadow:8.3.5"

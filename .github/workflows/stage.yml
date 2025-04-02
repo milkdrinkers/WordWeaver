@@ -1,0 +1,193 @@
+name: Stage
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        description: "The OS the workflow should use"
+        required: false
+        type: string
+        default: ubuntu-latest
+      java:
+        description: "The Java version the workflow should use"
+        required: false
+        type: number
+        default: 21
+      retention_days:
+        description: "Artifact retention days (default: 7)"
+        required: false
+        type: number
+        default: 7
+      generate_attestations:
+        description: "Whether to generate build provenance attestations (default: true)"
+        required: false
+        type: boolean
+        default: true
+      snapshot_suffix:
+        description: "Suffix to add to snapshot versions (default: -SNAPSHOT)"
+        required: false
+        type: string
+        default: "-SNAPSHOT"
+      prerelease_suffix:
+        description: "Pattern to identify pre-releases (default: -RC)"
+        required: false
+        type: string
+        default: '-RC'
+      gradle_build_options:
+        description: "Additional Gradle build options (default: --info)"
+        required: false
+        type: string
+        default: "--info"
+
+permissions:
+  attestations: write
+  contents: write
+  id-token: write
+
+jobs:
+  # Build and upload snapshot artifacts for non-tag pushes
+  stage-build-snapshot:
+    name: "Build Snapshot"
+    if: github.ref_type != 'tag'
+    runs-on: ${{ inputs.os }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1 # Shallow clone for faster checkout
+
+      - name: Setup JDK
+        uses: ./.github/actions/jdk
+        with:
+          java-version: ${{ inputs.java }}
+
+      - name: Setup Gradle
+        uses: ./.github/actions/gradle
+
+      # Get version field in project properties file for snapshot version
+      - name: Get Project Version
+        id: version
+        uses: ./.github/actions/version
+        with:
+          snapshot_suffix: ${{ inputs.snapshot_suffix }}
+
+      # Build the project with the snapshot version and publish to maven central
+      - name: Build with Gradle
+        shell: bash
+        run: |
+          set +e  # Don't exit immediately on error
+          ./gradlew publish --no-configuration-cache -PaltVer=${{ steps.version.outputs.version_snapshot }} -x test ${{ inputs.gradle_build_options }}
+          BUILD_EXIT_CODE=$?
+          
+          if [ $BUILD_EXIT_CODE -ne 0 ]; then
+            echo "::error::Build failed with exit code $BUILD_EXIT_CODE"
+            exit $BUILD_EXIT_CODE
+          fi
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.MAVEN_CENTRAL_GPG_SECRET_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.MAVEN_CENTRAL_GPG_SECRET_KEY_PASSWORD }}
+
+      # Generate build provenance attestations if enabled
+      - name: Generate Build Provenance Attestations
+        if: ${{ inputs.generate_attestations }}
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            ${{ github.workspace }}/**/build/libs/*.jar
+
+      # Upload the snapshot artifacts
+      - name: Upload Snapshot Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Snapshot-${{ github.run_number }}
+          path: ${{ github.workspace }}/**/build/libs/*.jar
+          retention-days: ${{ inputs.retention_days }}
+          if-no-files-found: error
+
+  # Update version in properties file for release builds
+  stage-version:
+    name: "Update Project Version"
+    runs-on: ${{ inputs.os }}
+    if: github.ref_type == 'tag'
+    steps:
+      # Checkout repository
+      - name: Checkout Repository
+        if: ${{ !contains(github.ref_name, inputs.prerelease_suffix) }}
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1 # Shallow clone for faster checkout
+
+      # Update version field in project properties file
+      - name: Update Project Version
+        if: ${{ !contains(github.ref_name, inputs.prerelease_suffix) }}
+        uses: ./.github/actions/updateversion
+        with:
+          version: ${{ github.ref_name }}
+
+      # Commit and push updated version properties file
+      - name: Update repository
+        if: ${{ !contains(github.ref_name, inputs.prerelease_suffix) }}
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: bump version to ${{ github.ref_name }}"
+          branch: ${{ github.event.repository.default_branch }}
+
+  # Build and upload release artifacts
+  stage-build-release:
+    name: "Build Release"
+    needs: stage-version
+    runs-on: ${{ inputs.os }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1 # Shallow clone for faster checkout
+
+      - name: Setup JDK
+        uses: ./.github/actions/jdk
+        with:
+          java-version: ${{ inputs.java }}
+
+      - name: Setup Gradle
+        uses: ./.github/actions/gradle
+
+      - name: Set Version Environment Variable
+        id: version
+        shell: bash
+        run: |
+          echo "version=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+
+      # Build with Gradle and Publish
+      - name: Build with Gradle & Publish
+        shell: bash
+        run: |
+          set +e  # Don't exit immediately on error
+          ./gradlew publishAllPublicationsToMavenCentralRepository -PaltVer=${{ steps.version.outputs.version }} -x test ${{ inputs.gradle_build_options }}
+          BUILD_EXIT_CODE=$?
+          
+          if [ $BUILD_EXIT_CODE -ne 0 ]; then
+            echo "::error::Build failed with exit code $BUILD_EXIT_CODE"
+            exit $BUILD_EXIT_CODE
+          fi
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.MAVEN_CENTRAL_GPG_SECRET_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.MAVEN_CENTRAL_GPG_SECRET_KEY_PASSWORD }}
+
+      - name: Generate Build Provenance Attestations
+        if: ${{ inputs.generate_attestations }}
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            ${{ github.workspace }}/**/build/libs/*.jar
+
+      - name: Upload Release Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Release
+          path: ${{ github.workspace }}/**/build/libs/*.jar
+          retention-days: ${{ inputs.retention_days }}
+          if-no-files-found: error
