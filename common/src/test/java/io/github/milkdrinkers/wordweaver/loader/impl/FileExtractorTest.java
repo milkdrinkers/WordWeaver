@@ -154,12 +154,12 @@ class FileExtractorTest {
         findResourcesMethod.setAccessible(true);
 
         @SuppressWarnings("unchecked")
-        List<String> resources = (List<String>) findResourcesMethod.invoke(null, Path.of("lang"));
+        List<Path> resources = (List<Path>) findResourcesMethod.invoke(null, Path.of("lang"));
 
         // Verify both files were found
         assertEquals(2, resources.size());
         List<String> fileNames = resources.stream()
-            .map(s -> s.substring(s.lastIndexOf('/') + 1))
+            .map(s -> s.getFileName().toString())
             .toList();
         assertTrue(fileNames.contains("en_US.jsonc"));
         assertTrue(fileNames.contains("fr_FR.jsonc"));
