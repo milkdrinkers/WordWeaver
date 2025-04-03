@@ -9,7 +9,7 @@ plugins {
 dependencies {
     implementation(libs.slf4j.api)
     implementation(libs.gson)
-    implementation(libs.adventure)
+    compileOnlyApi(libs.adventure)
 
     testImplementation(libs.slf4j.simple)
 }

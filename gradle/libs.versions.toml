@@ -1,15 +1,16 @@
 [versions]
+adventure = "4.+"
 slf4j = "2.0.17"
 
 [libraries]
-adventure = { module = "net.kyori:adventure-api", version = "4.19.0" }
 annotations = "org.jetbrains:annotations:26.0.2"
+adventure = { module = "net.kyori:adventure-api", version.ref = "adventure" }
 gson = "com.google.code.gson:gson:2.11.0"
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 junit-bom = "org.junit:junit-bom:5.11.3"
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
 junit-platform = { module = "org.junit.platform:junit-platform-launcher" }
-slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
-slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 
 [bundles]
 junit = ["junit-jupiter", "junit-platform"]
