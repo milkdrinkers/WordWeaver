@@ -7,6 +7,7 @@ import java.io.IOException;
 
 /**
  * Interface for loading language files from various sources
+ *
  * @see LanguageRegistry
  * @see Language
  */

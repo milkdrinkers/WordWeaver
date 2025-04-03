@@ -18,9 +18,10 @@ public interface MissingTranslationHandler {
 
     /**
      * Handle a missing entry for a key.
-     * @param config The translation config
+     *
+     * @param config   The translation config
      * @param registry The language registry
-     * @param key The key to the translation
+     * @param key      The key to the translation
      * @param fallback The default value provided by the developer
      * @return The value to return if the key is missing
      */
@@ -28,9 +29,10 @@ public interface MissingTranslationHandler {
 
     /**
      * Handle a missing entry for a key.
-     * @param config The translation config
+     *
+     * @param config   The translation config
      * @param registry The language registry
-     * @param key The key to the translation
+     * @param key      The key to the translation
      * @param fallback The default value provided by the developer
      * @return The value to return if the key is missing
      */
@@ -38,9 +40,10 @@ public interface MissingTranslationHandler {
 
     /**
      * Handle a missing entry for a key.
-     * @param config The translation config
+     *
+     * @param config   The translation config
      * @param registry The language registry
-     * @param key The key to the translation
+     * @param key      The key to the translation
      * @param fallback The default value provided by the developer
      * @return The value to return if the key is missing
      */
@@ -48,9 +51,10 @@ public interface MissingTranslationHandler {
 
     /**
      * Handle a missing entry for a key.
-     * @param config The translation config
+     *
+     * @param config   The translation config
      * @param registry The language registry
-     * @param key The key to the translation
+     * @param key      The key to the translation
      * @param fallback The default value provided by the developer
      * @return The value to return if the key is missing
      */

@@ -1,10 +1,12 @@
 {
-  "welcome": "Welcome to our server!",
-  "goodbye": "Goodbye, <player>!",
-  "item.name": "Example Item",
-  "item.description": "This is a test item.",
-  "chat.message": "<player_name>: <message>", // This is a json comment
-  "color.test": "This is &aGreen&r, and this is &bBlue&r, and this is <#FF0000>Red", /* This is also a json */
-  "hex.color": "This is <#00FF00>Green",
-  "hex.color2": "This is also <#00FF00>Green"
+    "welcome": "Welcome to our server!",
+    "goodbye": "Goodbye, <player>!",
+    "item.name": "Example Item",
+    "item.description": "This is a test item.",
+    "chat.message": "<player_name>: <message>",
+    // This is a json comment
+    "color.test": "This is &aGreen&r, and this is &bBlue&r, and this is <#FF0000>Red",
+    /* This is also a json */
+    "hex.color": "This is <#00FF00>Green",
+    "hex.color2": "This is also <#00FF00>Green"
 }

@@ -13,6 +13,7 @@ import java.util.Set;
  * It is used to manage and access language entries in WordWeaver.
  * <p>
  * This interface is used by the {@link LanguageRegistry} to load and manage translations/{@link LanguageEntry}'s.
+ *
  * @see LanguageRegistry
  */
 public interface Language {
@@ -57,6 +58,7 @@ public interface Language {
 
     /**
      * Get all keys in this language
+     *
      * @return A set of all keys in this language
      */
     Set<String> keys();

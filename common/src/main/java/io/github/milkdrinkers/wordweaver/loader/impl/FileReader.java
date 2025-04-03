@@ -24,6 +24,7 @@ final class FileReader {
 
     /**
      * Reads a map of translation from a json file
+     *
      * @param path The path to the file
      * @return A map of translations
      * @throws LanguageLoadException If the file does not exist, can not be read, is not a file, or the json is malformed
@@ -34,6 +35,7 @@ final class FileReader {
 
     /**
      * Reads a map of translation from a json file
+     *
      * @param path The path to the file
      * @return A map of translations
      * @throws LanguageLoadException If the file does not exist, can not be read, is not a file, or the json is malformed
@@ -44,6 +46,7 @@ final class FileReader {
 
     /**
      * Reads a map of translation from a json file
+     *
      * @param file The file to read
      * @return A map of translations
      * @throws LanguageLoadException If the file does not exist, can not be read, is not a file, or the json is malformed
@@ -75,7 +78,7 @@ final class FileReader {
             return flatten(jsonObject);
         } catch (JsonIOException e) {
             throw new LanguageLoadException("Failed to read json from reader!", e);
-        } catch (JsonSyntaxException e){
+        } catch (JsonSyntaxException e) {
             throw new LanguageLoadException("Failed to read json as it is malformed!", e);
         } catch (IOException e) {
             throw new LanguageLoadException("Failed to read json as the file does not exist!", e);
@@ -84,6 +87,7 @@ final class FileReader {
 
     /**
      * Flattens a JsonObject into a map of translations
+     *
      * @param jsonObject The JsonObject to flatten
      * @return A map of translations
      */
@@ -101,8 +105,9 @@ final class FileReader {
 
     /**
      * Flattens a JsonElement into a map of translations
-     * @param currentPath The current path in the translationMap (Used in recursion)
-     * @param element The current JsonElement
+     *
+     * @param currentPath    The current path in the translationMap (Used in recursion)
+     * @param element        The current JsonElement
      * @param translationMap The map that stores the translations
      */
     private static void flattenJsonElement(final String currentPath, final JsonElement element, final Map<String, LanguageEntry> translationMap) {
@@ -110,14 +115,11 @@ final class FileReader {
             final JsonPrimitive jsonPrimitive = element.getAsJsonPrimitive();
 
             translationMap.put(currentPath, new LanguageEntryImpl(LanguageEntry.Type.STRING, jsonPrimitive.getAsString()));
-        }
-        else if (element.isJsonObject()) {
+        } else if (element.isJsonObject()) {
             flattenObject(currentPath, element, translationMap);
-        }
-        else if (element.isJsonArray()) {
+        } else if (element.isJsonArray()) {
             flattenArray(currentPath, element, translationMap);
-        }
-        else if (element.isJsonNull()) {
+        } else if (element.isJsonNull()) {
             // Add empty translation for null
             translationMap.put(currentPath, new LanguageEntryImpl(LanguageEntry.Type.STRING, ""));
         }
@@ -125,8 +127,9 @@ final class FileReader {
 
     /**
      * Recursively iterates through objects and stores primitive values
-     * @param currentPath The current path in the translationMap
-     * @param element The current JsonElement
+     *
+     * @param currentPath    The current path in the translationMap
+     * @param element        The current JsonElement
      * @param translationMap The map that stores the translations
      */
     private static void flattenObject(final String currentPath, final JsonElement element, final Map<String, LanguageEntry> translationMap) {
@@ -145,8 +148,9 @@ final class FileReader {
 
     /**
      * Recursively iterates through arrays and stores primitive values
-     * @param currentPath The current path in the translationMap
-     * @param element The current JsonElement
+     *
+     * @param currentPath    The current path in the translationMap
+     * @param element        The current JsonElement
      * @param translationMap The map that stores the translations
      * @implNote This method stores individual elements with array indices and the complete array as a Translation with all values
      */

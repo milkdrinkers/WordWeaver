@@ -3,14 +3,14 @@ package io.github.milkdrinkers.wordweaver.loader.impl;
 import io.github.milkdrinkers.wordweaver.config.TranslationConfig;
 import io.github.milkdrinkers.wordweaver.loader.TranslationLoader;
 import io.github.milkdrinkers.wordweaver.storage.Language;
+import io.github.milkdrinkers.wordweaver.storage.LanguageEntry;
 import io.github.milkdrinkers.wordweaver.storage.LanguageLoadException;
 import io.github.milkdrinkers.wordweaver.storage.LanguageRegistry;
-import io.github.milkdrinkers.wordweaver.storage.LanguageEntry;
 import io.github.milkdrinkers.wordweaver.storage.impl.LanguageImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -21,7 +21,7 @@ import java.util.stream.Stream;
  */
 public class JsonTranslationLoader implements TranslationLoader {
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonTranslationLoader.class);
-    
+
     private final TranslationConfig config;
     private final LanguageRegistry registry;
 
@@ -62,7 +62,7 @@ public class JsonTranslationLoader implements TranslationLoader {
             // Load each translation file
             try (Stream<Path> files = Files.list(config.getLanguagesDirectory())) {
                 files.filter(path -> path.toString().endsWith(".jsonc") || path.toString().endsWith(".json"))
-                .forEach(this::load);
+                    .forEach(this::load);
             }
         } catch (RuntimeException e) {
             LOGGER.error("Failed to load language files: ", e);

@@ -9,6 +9,7 @@ import java.util.Set;
  * Interface for a registry containing languages
  * <p>
  * Used in {@link io.github.milkdrinkers.wordweaver.service.TranslationService} to hold loaded languages
+ *
  * @see io.github.milkdrinkers.wordweaver.service.TranslationService
  */
 public interface LanguageRegistry {

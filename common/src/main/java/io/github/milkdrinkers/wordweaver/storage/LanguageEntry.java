@@ -7,6 +7,7 @@ import java.util.List;
  * <p>
  * This interface is used to represent a single translation entry in a language. It is used to
  * provide a common interface for all entries, regardless of their native json type.
+ *
  * @see Language
  */
 public interface LanguageEntry {
@@ -24,12 +25,14 @@ public interface LanguageEntry {
 
     /**
      * Get the value of this entry.
+     *
      * @return The value of this entry.
      */
     String getValue();
 
     /**
      * Get the values of this entry.
+     *
      * @return The values of this entry.
      */
     List<String> getValues();

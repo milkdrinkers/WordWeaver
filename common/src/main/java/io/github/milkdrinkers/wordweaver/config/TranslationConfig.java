@@ -12,7 +12,7 @@ import java.util.function.Function;
  */
 public class TranslationConfig {
     public static final String DEFAULT_LANG = "en_US";
-    
+
     // Configuration
     private Path languagesDirectory;
     private String defaultLanguage;
@@ -81,6 +81,7 @@ public class TranslationConfig {
 
     /**
      * Creates a new builder for the TranslationConfig
+     *
      * @return A new builder instance
      */
     public static Builder builder() {
@@ -93,10 +94,12 @@ public class TranslationConfig {
     public static class Builder {
         private final TranslationConfig config = new TranslationConfig();
 
-        private Builder() {}
+        private Builder() {
+        }
 
         /**
          * Set the directory where translation files are located.
+         *
          * @param directory The directory to use
          */
         public Builder translationDirectory(Path directory) {
@@ -106,6 +109,7 @@ public class TranslationConfig {
 
         /**
          * Sets the default language to use, this is used as a fallback if a key cannot be found in the requested language.
+         *
          * @param language The language code like <a href="https://minecraft.gamepedia.com/Language">Minecraft Wiki</a> (e.g., "en_US", "xx_XX").
          * @implNote Defaults to {@code en_US}
          */
@@ -116,6 +120,7 @@ public class TranslationConfig {
 
         /**
          * Sets the language to use
+         *
          * @param language The language code like <a href="https://minecraft.gamepedia.com/Language">Minecraft Wiki</a> (e.g., "en_US", "xx_XX").
          * @implNote Defaults to the value of {@link #defaultLanguage(String)}
          */
@@ -126,6 +131,7 @@ public class TranslationConfig {
 
         /**
          * Set the subdirectory where language files are located in the resources directory.
+         *
          * @param path Relative path to the subdirectory where language files are located.
          * @implNote Defaults to {@code lang}. This defines where the language files shipped with your program are located.
          */
@@ -136,6 +142,7 @@ public class TranslationConfig {
 
         /**
          * Set whether to extract missing language files to the languages directory
+         *
          * @param extract Whether to extract missing language files
          * @implNote Defaults to true
          */
@@ -146,6 +153,7 @@ public class TranslationConfig {
 
         /**
          * Set whether to add missing keys to existing language files
+         *
          * @param update Whether to add missing keys to existing language files
          * @implNote Defaults to true
          */
@@ -156,6 +164,7 @@ public class TranslationConfig {
 
         /**
          * Set the handler for missing translations.
+         *
          * @param handler The handler to use for missing translations
          * @implNote Defaults to {@link MissingTranslationHandler#DEFAULT}
          * @see MissingTranslationHandler
@@ -167,6 +176,7 @@ public class TranslationConfig {
 
         /**
          * Set the function used to convert strings to components
+         *
          * @param converter The function to convert a string to a Component.
          * @implNote Defaults to {@link Component#text(String)}
          */

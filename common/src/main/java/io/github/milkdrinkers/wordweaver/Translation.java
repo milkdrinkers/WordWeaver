@@ -23,10 +23,12 @@ import java.util.Set;
 public final class Translation {
     private static final Logger LOGGER = LoggerFactory.getLogger(Translation.class);
 
-    private Translation() {}
+    private Translation() {
+    }
 
     /**
      * Get a translation string by key
+     *
      * @param key The key to the translation
      */
     public static String of(String key) {
@@ -35,7 +37,8 @@ public final class Translation {
 
     /**
      * Get a translation string by key
-     * @param key The key to the translation
+     *
+     * @param key      The key to the translation
      * @param fallback The default value to return if no valid value was found
      */
     public static String of(String key, String fallback) {
@@ -44,6 +47,7 @@ public final class Translation {
 
     /**
      * Get a list of translation strings by key
+     *
      * @param key The key to the translation
      * @see #ofList(String)
      */
@@ -53,7 +57,8 @@ public final class Translation {
 
     /**
      * Get a list of translation strings by key
-     * @param key The key to the translation
+     *
+     * @param key      The key to the translation
      * @param fallback The default value to return if no valid value was found, empty list if null
      */
     public static List<String> ofList(String key, @Nullable List<String> fallback) {
@@ -62,6 +67,7 @@ public final class Translation {
 
     /**
      * Get a translation as an Adventure Component
+     *
      * @param key The key to the translation
      * @see Component
      */
@@ -71,7 +77,8 @@ public final class Translation {
 
     /**
      * Get a translation as an Adventure Component
-     * @param key The key to the translation
+     *
+     * @param key      The key to the translation
      * @param fallback The default value to return if no valid value was found
      * @see Component
      */
@@ -81,6 +88,7 @@ public final class Translation {
 
     /**
      * Get a list of translation Adventure Components by key
+     *
      * @param key The key to the translation
      * @see #asList(String, List)
      * @see Component
@@ -91,7 +99,8 @@ public final class Translation {
 
     /**
      * Get a list as translation Adventure Components by key
-     * @param key The key to the translation
+     *
+     * @param key      The key to the translation
      * @param fallback The default value to return if no valid value was found, empty list if null
      * @see #asList(String)
      * @see Component
@@ -102,6 +111,7 @@ public final class Translation {
 
     /**
      * Get a list of all translation entries in the current and fallback language
+     *
      * @return A set of all keys in the current and fallback language
      */
     public static Set<String> getKeys() {
@@ -110,6 +120,7 @@ public final class Translation {
 
     /**
      * Set the default/fallback language
+     *
      * @param language The language code like <a href="https://minecraft.gamepedia.com/Language">Minecraft Wiki</a> (e.g., "en_US", "xx_XX")
      */
     public static void setDefaultLanguage(@NotNull String language) {
@@ -125,6 +136,7 @@ public final class Translation {
 
     /**
      * Set the active language
+     *
      * @param language The language code like <a href="https://minecraft.gamepedia.com/Language">Minecraft Wiki</a> (e.g., "en_US", "xx_XX")
      */
     public static void setLanguage(@NotNull String language) {
@@ -140,6 +152,7 @@ public final class Translation {
 
     /**
      * Initialize WordWeaver
+     *
      * @implSpec This method will initialize the translation system with the provided configuration. WordWeaver will throw exceptions if it has not been initialized before usage.
      */
     public static void initialize(@NotNull TranslationConfig config) {

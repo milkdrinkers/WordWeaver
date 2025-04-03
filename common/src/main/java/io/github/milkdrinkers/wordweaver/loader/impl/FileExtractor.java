@@ -1,9 +1,14 @@
 package io.github.milkdrinkers.wordweaver.loader.impl;
 
-import com.google.gson.*;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import io.github.milkdrinkers.wordweaver.Translation;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -16,12 +21,13 @@ final class FileExtractor {
     @SuppressWarnings("FieldMayBeFinal")
     private static ClassLoader CLASS_LOADER = FileExtractor.class.getClassLoader();
 
-    private FileExtractor() {}
+    private FileExtractor() {
+    }
 
     /**
      * Extracts Json files from JAR if they don't exist in the target directory
      *
-     * @param outputDir The directory where files should be extracted
+     * @param outputDir   The directory where files should be extracted
      * @param resourceDir Relative path to the subdirectory where language files are located in the resources directory.
      * @return List of paths to extracted files
      * @throws IOException If an I/O error occurs
@@ -76,6 +82,7 @@ final class FileExtractor {
 
     /**
      * Finds Json/Jsonc resources when running from a JAR
+     *
      * @param resourceDir Relative path to the subdirectory where language files are located in the resources directory.
      */
     private static List<Path> findResourcesInJar(Path resourceDir) throws IOException {
@@ -118,6 +125,7 @@ final class FileExtractor {
 
     /**
      * Finds Json/Jsonc resources when running from the filesystem (development mode)
+     *
      * @param resourceDir Relative path to the subdirectory where language files are located in the resources directory.
      */
     private static List<Path> findResourcesInFileSystem(Path resourceDir) throws IOException {
@@ -157,7 +165,8 @@ final class FileExtractor {
 
     /**
      * Updates existing Json files in the output directory by merging them with the corresponding resource files
-     * @param outputDir The directory where files should be extracted
+     *
+     * @param outputDir   The directory where files should be extracted
      * @param resourceDir Relative path to the subdirectory where language files are located in the resources directory.
      * @throws IOException If an I/O error occurs
      */
@@ -211,6 +220,7 @@ final class FileExtractor {
 
     /**
      * Recursively merges Json objects, adding missing keys from origin to target while preserving target's existing values and maintaining origin's order.
+     *
      * @param origin The original Json object
      * @param target The user modified Json object
      * @return The merged Json object

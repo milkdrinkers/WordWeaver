@@ -2,8 +2,8 @@ package io.github.milkdrinkers.wordweaver;
 
 import io.github.milkdrinkers.wordweaver.config.TranslationConfig;
 import io.github.milkdrinkers.wordweaver.storage.Language;
-import io.github.milkdrinkers.wordweaver.storage.LanguageRegistry;
 import io.github.milkdrinkers.wordweaver.storage.LanguageEntry;
+import io.github.milkdrinkers.wordweaver.storage.LanguageRegistry;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -23,7 +23,8 @@ public class DefaultMissingTranslationHandler implements MissingTranslationHandl
     private final Function<@Nullable Component, Component> componentResultHandler = (fallback) -> fallback == null ? Component.empty() : fallback;
     private final Function<@Nullable List<Component>, List<Component>> componentResultHandler2 = (fallback) -> fallback == null ? Collections.emptyList() : fallback;
 
-    DefaultMissingTranslationHandler() {}
+    DefaultMissingTranslationHandler() {
+    }
 
     @Override
     public @Nullable String handle(TranslationConfig config, LanguageRegistry registry, String key, @Nullable String fallback) {
