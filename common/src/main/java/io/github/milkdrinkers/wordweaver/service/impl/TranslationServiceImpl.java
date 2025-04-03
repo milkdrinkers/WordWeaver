@@ -154,7 +154,11 @@ public class TranslationServiceImpl implements TranslationService {
 
     @Override
     public void reload() {
-        registry.clear();
-        initialize();
+        try {
+            registry.clear();
+            loader.loadLanguages();
+        } catch (Exception e) {
+            LOGGER.error("Failed to reload translation service", e);
+        }
     }
 }
