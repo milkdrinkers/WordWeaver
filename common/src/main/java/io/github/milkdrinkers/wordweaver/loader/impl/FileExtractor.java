@@ -31,14 +31,14 @@ final class FileExtractor {
             Files.createDirectories(outputDir);
 
         final List<Path> extractedFiles = new ArrayList<>();
-        final List<String> resourceFiles = findJsonResourceFiles(); // Find 
+        final List<String> resourceFiles = findJsonResourceFiles();
 
         for (String resourcePath : resourceFiles) {
             final String fileName = Paths.get(resourcePath).getFileName().toString(); // Get just the filename
             final Path targetFile = outputDir.resolve(fileName);
 
             // Only extract if file doesn't exist
-            if (!Files.exists(targetFile)) {
+            if (Files.notExists(targetFile)) {
                 extractResourceFile(resourcePath, targetFile);
                 extractedFiles.add(targetFile);
             }
