@@ -1,5 +1,5 @@
 [versions]
-adventure = "4.+"
+adventure = "[4,5)"
 slf4j = "2.0.17"
 
 [libraries]
