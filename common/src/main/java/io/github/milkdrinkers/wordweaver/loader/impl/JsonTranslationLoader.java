@@ -34,7 +34,7 @@ public class JsonTranslationLoader implements TranslationLoader {
     public void extractMissingLanguages() throws IOException {
         // Extract missing language files from .jar resources
         try {
-            FileExtractor.extractJsonResources(config.getTranslationDirectory());
+            FileExtractor.extractJsonResources(config.getLanguagesDirectory(), config.getResourcesDirectory());
         } catch (RuntimeException e) {
             LOGGER.error("Failed to extract missing language files: ", e);
             throw e;
@@ -45,7 +45,7 @@ public class JsonTranslationLoader implements TranslationLoader {
     public void updateExistingLanguages() throws IOException {
         // Add missing entries from .jar resources to extracted language files
         try {
-            FileExtractor.updateFiles(config.getTranslationDirectory());
+            FileExtractor.updateFiles(config.getLanguagesDirectory(), config.getResourcesDirectory());
         } catch (RuntimeException e) {
             LOGGER.error("Failed to update existing language files: ", e);
             throw e;
@@ -57,10 +57,10 @@ public class JsonTranslationLoader implements TranslationLoader {
         // Load languages from extracted languages
         try {
             // Create directory if it doesn't exist
-            Files.createDirectories(config.getTranslationDirectory());
+            Files.createDirectories(config.getLanguagesDirectory());
 
             // Load each translation file
-            try (Stream<Path> files = Files.list(config.getTranslationDirectory())) {
+            try (Stream<Path> files = Files.list(config.getLanguagesDirectory())) {
                 files.filter(path -> path.toString().endsWith(".jsonc") || path.toString().endsWith(".json"))
                 .forEach(this::load);
             }

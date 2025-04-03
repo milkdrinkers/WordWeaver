@@ -40,7 +40,7 @@ class FileExtractorTest {
     @Test
     void shouldExtractJsonResources() throws IOException {
         // Extract resources
-        List<Path> extractedFiles = FileExtractor.extractJsonResources(outputDir);
+        List<Path> extractedFiles = FileExtractor.extractJsonResources(outputDir, Path.of("lang"));
 
         // Verify extracted files
         assertEquals(2, extractedFiles.size());
@@ -60,7 +60,7 @@ class FileExtractorTest {
         Files.writeString(existingFile2, "{\"existing\":\"content\"}");
 
         // Extract resources
-        List<Path> extractedFiles = FileExtractor.extractJsonResources(outputDir);
+        List<Path> extractedFiles = FileExtractor.extractJsonResources(outputDir, Path.of("lang"));
 
         // Verify no files were extracted
         assertEquals(0, extractedFiles.size());
@@ -123,7 +123,7 @@ class FileExtractorTest {
         Files.writeString(existingFile, "{\"greeting\":\"Hello\"}");
 
         // Call updateFiles method
-        FileExtractor.updateFiles(outputDir);
+        FileExtractor.updateFiles(outputDir, Path.of("lang"));
     }
 
     /**
@@ -150,11 +150,11 @@ class FileExtractorTest {
         classLoaderField.set(null, testLoader);
 
         // Call method via reflection
-        Method findResourcesMethod = FileExtractor.class.getDeclaredMethod("findResourcesInFileSystem");
+        Method findResourcesMethod = FileExtractor.class.getDeclaredMethod("findResourcesInFileSystem", Path.class);
         findResourcesMethod.setAccessible(true);
 
         @SuppressWarnings("unchecked")
-        List<String> resources = (List<String>) findResourcesMethod.invoke(null);
+        List<String> resources = (List<String>) findResourcesMethod.invoke(null, Path.of("lang"));
 
         // Verify both files were found
         assertEquals(2, resources.size());

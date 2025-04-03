@@ -34,8 +34,10 @@ public class TranslationServiceImpl implements TranslationService {
     private void initialize() {
         try {
             // Extract, update and load translations
-            loader.extractMissingLanguages();
-            loader.updateExistingLanguages();
+            if (config.shouldExtractLanguages())
+                loader.extractMissingLanguages();
+            if (config.shouldUpdateLanguages())
+                loader.updateExistingLanguages();
             loader.loadLanguages();
         } catch (Exception e) {
             LOGGER.error("Failed to initialize translation service", e);

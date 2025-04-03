@@ -4,6 +4,7 @@ import io.github.milkdrinkers.wordweaver.MissingTranslationHandler;
 import net.kyori.adventure.text.Component;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.function.Function;
 
 /**
@@ -13,9 +14,12 @@ public class TranslationConfig {
     public static final String DEFAULT_LANG = "en_US";
     
     // Configuration
-    private Path translationDirectory;
+    private Path languagesDirectory;
     private String defaultLanguage;
     private String currentLanguage;
+
+    private Path resourcesDirectory;
+    private boolean extractLanguages;
     private boolean updateLanguages;
 
     // Behavior
@@ -23,17 +27,20 @@ public class TranslationConfig {
     private Function<String, Component> componentConverter;
 
     private TranslationConfig() {
-        this.translationDirectory = null;
+        this.languagesDirectory = null;
         this.defaultLanguage = DEFAULT_LANG;
         this.currentLanguage = defaultLanguage;
+
+        this.resourcesDirectory = Paths.get("lang");
+        this.extractLanguages = true;
         this.updateLanguages = true;
 
         this.missingTranslationHandler = MissingTranslationHandler.DEFAULT;
         this.componentConverter = Component::text;
     }
 
-    public Path getTranslationDirectory() {
-        return translationDirectory;
+    public Path getLanguagesDirectory() {
+        return languagesDirectory;
     }
 
     public String getDefaultLanguage() {
@@ -52,7 +59,15 @@ public class TranslationConfig {
         this.currentLanguage = currentLanguage;
     }
 
-    public boolean updateLanguages() {
+    public Path getResourcesDirectory() {
+        return resourcesDirectory;
+    }
+
+    public boolean shouldExtractLanguages() {
+        return extractLanguages;
+    }
+
+    public boolean shouldUpdateLanguages() {
         return updateLanguages;
     }
 
@@ -85,7 +100,7 @@ public class TranslationConfig {
          * @param directory The directory to use
          */
         public Builder translationDirectory(Path directory) {
-            config.translationDirectory = directory;
+            config.languagesDirectory = directory;
             return this;
         }
 
@@ -106,6 +121,26 @@ public class TranslationConfig {
          */
         public Builder language(String language) {
             config.currentLanguage = language;
+            return this;
+        }
+
+        /**
+         * Set the subdirectory where language files are located in the resources directory.
+         * @param path Relative path to the subdirectory where language files are located.
+         * @implNote Defaults to {@code lang}. This defines where the language files shipped with your program are located.
+         */
+        public Builder resourcesDirectory(Path path) {
+            config.resourcesDirectory = path;
+            return this;
+        }
+
+        /**
+         * Set whether to extract missing language files to the languages directory
+         * @param extract Whether to extract missing language files
+         * @implNote Defaults to true
+         */
+        public Builder extractLanguages(boolean extract) {
+            config.extractLanguages = extract;
             return this;
         }
 
@@ -146,7 +181,7 @@ public class TranslationConfig {
          * @return The configured TranslationConfig
          */
         public TranslationConfig build() {
-            if (config.translationDirectory == null)
+            if (config.languagesDirectory == null)
                 throw new IllegalStateException("Translation directory must be set");
 
             if (config.defaultLanguage == null || config.defaultLanguage.isEmpty())
@@ -154,6 +189,12 @@ public class TranslationConfig {
 
             if (config.currentLanguage == null || config.currentLanguage.isEmpty())
                 config.currentLanguage = config.defaultLanguage;
+
+            if (config.resourcesDirectory == null)
+                config.resourcesDirectory = Paths.get("lang");
+
+            if (config.resourcesDirectory.isAbsolute())
+                throw new IllegalStateException("Resources directory must be relative");
 
             if (config.missingTranslationHandler == null)
                 config.missingTranslationHandler = MissingTranslationHandler.DEFAULT;
