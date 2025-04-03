@@ -5,28 +5,28 @@ import io.github.milkdrinkers.wordweaver.storage.Language;
 import io.github.milkdrinkers.wordweaver.storage.LanguageRegistry;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class LanguageRegistryImpl implements LanguageRegistry {
-    private final ConcurrentHashMap<String, Language> languages;
-    private final Set<String> keys;
+    private final AtomicReference<Map<String, Language>> languages;
+    private final AtomicReference<Set<String>> keys;
     private final TranslationConfig config;
 
-    private Language currentLanguage;
-    private Language defaultLanguage;
+    private final AtomicReference<Language> currentLanguage;
+    private final AtomicReference<Language> defaultLanguage;
 
     public LanguageRegistryImpl(TranslationConfig config) {
         this.config = config;
-        this.languages = new ConcurrentHashMap<>();
-        this.keys = ConcurrentHashMap.newKeySet();
+        this.languages = new AtomicReference<>(Collections.unmodifiableMap(new HashMap<>()));
+        this.keys = new AtomicReference<>(Collections.unmodifiableSet(new HashSet<>()));
+        this.currentLanguage = new AtomicReference<>(null);
+        this.defaultLanguage = new AtomicReference<>(null);
     }
 
     @Override
     public @Nullable Language get(String name) {
-        return languages.get(name);
+        return languages.get().get(name);
     }
 
     @Override
@@ -36,7 +36,7 @@ public class LanguageRegistryImpl implements LanguageRegistry {
 
     @Override
     public @Nullable Language getCurrent() {
-        return currentLanguage;
+        return currentLanguage.get();
     }
 
     @Override
@@ -46,7 +46,7 @@ public class LanguageRegistryImpl implements LanguageRegistry {
 
     @Override
     public @Nullable Language getDefault() {
-        return defaultLanguage;
+        return defaultLanguage.get();
     }
 
     @Override
@@ -56,43 +56,56 @@ public class LanguageRegistryImpl implements LanguageRegistry {
 
     @Override
     public Set<String> getRegistered() {
-        return Collections.unmodifiableSet(languages.keySet());
+        return Collections.unmodifiableSet(languages.get().keySet());
     }
 
     @Override
     public boolean isRegistered(String name) {
-        return languages.containsKey(name);
+        return languages.get().containsKey(name);
     }
 
     @Override
     public Set<String> getKeys() {
-        return Collections.unmodifiableSet(keys);
+        return keys.get();
     }
 
     @Override
     public void register(Language language) {
-        languages.putIfAbsent(language.getName(), language);
+        // Update languages map
+        final Map<String, Language> updatedLanguages = new HashMap<>(languages.get());
+        updatedLanguages.putIfAbsent(language.getName(), language);
+        languages.set(Collections.unmodifiableMap(updatedLanguages));
 
-        if (currentLanguage == null && language.getName().equals(config.getCurrentLanguage())) {
-            currentLanguage = get(config.getCurrentLanguage());
+        // Update keys map
+        final Set<String> updatedKeys = new HashSet<>(getKeys());
 
-            if (currentLanguage != null)
-                keys.addAll(currentLanguage.keys());
+        // Cache the new language ref
+        final Language newLanguage = updatedLanguages.get(language.getName());
+
+        // Update current language if necessary
+        if (currentLanguage.get() == null && language.getName().equals(config.getCurrentLanguage())) {
+            currentLanguage.set(newLanguage);
+
+            if (newLanguage != null)
+                updatedKeys.addAll(newLanguage.keys());
         }
 
-        if (defaultLanguage == null && language.getName().equals(config.getDefaultLanguage())) {
-            defaultLanguage = get(config.getDefaultLanguage());
+        // Update default language if necessary
+        if (defaultLanguage.get() == null && language.getName().equals(config.getDefaultLanguage())) {
+            defaultLanguage.set(newLanguage);
 
-            if (defaultLanguage != null)
-                keys.addAll(defaultLanguage.keys());
+            if (newLanguage != null)
+                updatedKeys.addAll(newLanguage.keys());
         }
+
+        keys.set(Collections.unmodifiableSet(updatedKeys));
     }
 
     @Override
     public void clear() {
-        currentLanguage = null;
-        defaultLanguage = null;
-        keys.clear();
-        languages.clear();
+        currentLanguage.set(null);
+        defaultLanguage.set(null);
+        keys.set(Collections.unmodifiableSet(new HashSet<>()));
+        languages.set(Collections.unmodifiableMap(new HashMap<>()));
     }
 }

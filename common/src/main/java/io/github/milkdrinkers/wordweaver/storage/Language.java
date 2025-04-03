@@ -56,19 +56,6 @@ public interface Language {
     boolean has(String key);
 
     /**
-     * Add a entry to the language
-     * @param key The key to add
-     * @param entry The entry to add
-     */
-    void add(String key, LanguageEntry entry);
-
-    /**
-     * Remove a entry from the language
-     * @param key The key to remove
-     */
-    void remove(String key);
-
-    /**
      * Get all keys in this language
      * @return A set of all keys in this language
      */

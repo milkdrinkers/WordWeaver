@@ -4,19 +4,15 @@ import io.github.milkdrinkers.wordweaver.storage.Language;
 import io.github.milkdrinkers.wordweaver.storage.LanguageEntry;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 
 public class LanguageImpl implements Language {
     private final String languageName;
-    private final ConcurrentHashMap<String, LanguageEntry> translations;
+    private final Map<String, LanguageEntry> translations;
 
     public LanguageImpl(final String languageName, final Map<String, LanguageEntry> translations) {
         this.languageName = languageName;
-        this.translations = new ConcurrentHashMap<>(translations);
+        this.translations = Collections.unmodifiableMap(new HashMap<>(translations));
     }
 
     @Override
@@ -42,16 +38,6 @@ public class LanguageImpl implements Language {
     @Override
     public boolean has(String key) {
         return translations.containsKey(key);
-    }
-
-    @Override
-    public void add(String key, LanguageEntry entry) {
-        translations.put(key, entry);
-    }
-
-    @Override
-    public void remove(String key) {
-        translations.remove(key);
     }
 
     @Override
