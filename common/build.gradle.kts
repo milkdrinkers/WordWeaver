@@ -14,6 +14,17 @@ dependencies {
     testImplementation(libs.slf4j.simple)
 }
 
+tasks.build {
+    dependsOn(tasks.shadowJar)
+}
+
+tasks.shadowJar {
+    archiveClassifier.set("")
+    relocate("com.google.errorprone", "io.github.milkdrinkers.wordweaver.lib.errorprone")
+    relocate("com.google.gson", "io.github.milkdrinkers.wordweaver.lib.gson")
+    relocate("org.slf4j", "io.github.milkdrinkers.wordweaver.lib.slf4j")
+    minimize()
+}
 
 mavenPublishing {
     coordinates(
