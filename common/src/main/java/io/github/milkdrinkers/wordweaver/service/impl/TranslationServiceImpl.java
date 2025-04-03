@@ -120,16 +120,7 @@ public class TranslationServiceImpl implements TranslationService {
 
     @Override
     public Set<String> getKeys() {
-        final Language language1 = registry.getCurrent();
-        final Language language2 = registry.getDefault();
-
-        final Set<String> entries = new HashSet<>();
-        if (language1 != null)
-            entries.addAll(language1.keys());
-        if (language2 != null)
-            entries.addAll(language2.keys());
-
-        return entries; // TODO Cache this in registry
+        return registry.getKeys();
     }
 
     @Override

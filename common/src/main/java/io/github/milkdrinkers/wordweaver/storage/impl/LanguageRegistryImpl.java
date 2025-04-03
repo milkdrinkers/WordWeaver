@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class LanguageRegistryImpl implements LanguageRegistry {
     private final ConcurrentHashMap<String, Language> languages;
+    private final Set<String> keys;
     private final TranslationConfig config;
 
     private Language currentLanguage;
@@ -20,6 +21,7 @@ public class LanguageRegistryImpl implements LanguageRegistry {
     public LanguageRegistryImpl(TranslationConfig config) {
         this.config = config;
         this.languages = new ConcurrentHashMap<>();
+        this.keys = ConcurrentHashMap.newKeySet();
     }
 
     @Override
@@ -34,10 +36,6 @@ public class LanguageRegistryImpl implements LanguageRegistry {
 
     @Override
     public @Nullable Language getCurrent() {
-        // Lazy assignment of currentLanguage
-        if (currentLanguage == null && isRegistered(config.getCurrentLanguage()))
-            currentLanguage = get(config.getCurrentLanguage());
-
         return currentLanguage;
     }
 
@@ -48,10 +46,6 @@ public class LanguageRegistryImpl implements LanguageRegistry {
 
     @Override
     public @Nullable Language getDefault() {
-        // Lazy assignment of defaultLanguage
-        if (defaultLanguage == null && isRegistered(config.getDefaultLanguage()))
-            defaultLanguage = get(config.getDefaultLanguage());
-
         return defaultLanguage;
     }
 
@@ -71,14 +65,34 @@ public class LanguageRegistryImpl implements LanguageRegistry {
     }
 
     @Override
+    public Set<String> getKeys() {
+        return Collections.unmodifiableSet(keys);
+    }
+
+    @Override
     public void register(Language language) {
         languages.putIfAbsent(language.getName(), language);
+
+        if (currentLanguage == null && language.getName().equals(config.getCurrentLanguage())) {
+            currentLanguage = get(config.getCurrentLanguage());
+
+            if (currentLanguage != null)
+                keys.addAll(currentLanguage.keys());
+        }
+
+        if (defaultLanguage == null && language.getName().equals(config.getDefaultLanguage())) {
+            defaultLanguage = get(config.getDefaultLanguage());
+
+            if (defaultLanguage != null)
+                keys.addAll(defaultLanguage.keys());
+        }
     }
 
     @Override
     public void clear() {
         currentLanguage = null;
         defaultLanguage = null;
+        keys.clear();
         languages.clear();
     }
 }

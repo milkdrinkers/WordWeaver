@@ -72,6 +72,13 @@ public interface LanguageRegistry {
     boolean isRegistered(String name);
 
     /**
+     * Get a cached, combined {@link Set} of all the {@link LanguageEntry} keys in the registered current {@literal &} default languages
+     *
+     * @return The keys in current {@literal &} default languages
+     */
+    Set<String> getKeys();
+
+    /**
      * Register a new language
      *
      * @param language The language to register
