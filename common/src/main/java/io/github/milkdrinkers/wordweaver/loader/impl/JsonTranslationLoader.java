@@ -37,6 +37,7 @@ public class JsonTranslationLoader implements TranslationLoader {
             FileExtractor.extractJsonResources(config.getTranslationDirectory());
         } catch (RuntimeException e) {
             LOGGER.error("Failed to extract missing language files: ", e);
+            throw e;
         }
     }
 
@@ -47,6 +48,7 @@ public class JsonTranslationLoader implements TranslationLoader {
             FileExtractor.updateFiles(config.getTranslationDirectory());
         } catch (RuntimeException e) {
             LOGGER.error("Failed to update existing language files: ", e);
+            throw e;
         }
     }
 
@@ -64,6 +66,7 @@ public class JsonTranslationLoader implements TranslationLoader {
             }
         } catch (RuntimeException e) {
             LOGGER.error("Failed to load language files: ", e);
+            throw e;
         }
     }
 
