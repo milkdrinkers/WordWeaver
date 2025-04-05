@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 final class FileReader {
-    protected static final Gson GSON = new GsonBuilder()
+    static final Gson GSON = new GsonBuilder()
         .setPrettyPrinting()
         .disableHtmlEscaping()
         .setStrictness(Strictness.LENIENT)

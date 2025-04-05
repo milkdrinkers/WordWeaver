@@ -155,9 +155,9 @@ final class FileExtractor {
      * Extracts a resource file to the specified target path
      */
     private static void extractResourceFile(Path resourcePath, Path targetFile) throws IOException {
-        try (final InputStream inputStream = CLASS_LOADER.getResourceAsStream(resourcePath.toString())) {
+        try (final InputStream inputStream = CLASS_LOADER.getResourceAsStream(resourcePath.toString().replace("\\", "/"))) {
             if (inputStream == null)
-                throw new IOException("Resource not found: " + resourcePath);
+                throw new IOException("Resource not found while extracting: " + resourcePath);
 
             Files.copy(inputStream, targetFile, StandardCopyOption.REPLACE_EXISTING);
         }
@@ -200,9 +200,9 @@ final class FileExtractor {
      */
     private static void mergeJsonFiles(Path originPath, Path targetPath) throws IOException {
         // Read origin file from JAR
-        final InputStream originStream = CLASS_LOADER.getResourceAsStream(originPath.toString());
+        final InputStream originStream = CLASS_LOADER.getResourceAsStream(originPath.toString().replace("\\", "/"));
         if (originStream == null)
-            throw new IOException("Resource not found: " + originPath);
+            throw new IOException("Resource not found when merging: " + originPath);
         final Reader originReader = new InputStreamReader(originStream);
 
         // Read target file from filesystem
