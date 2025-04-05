@@ -23,6 +23,11 @@ import java.util.Set;
 public final class Translation {
     private static final Logger LOGGER = LoggerFactory.getLogger(Translation.class);
 
+    static {
+        if (LOGGER.getClass().getName().contains("NOPLogger"))
+            System.err.println("No SLF4J implementation found for WordWeaver. \nConsider adding an SLF4J compatible logging implementation to your project.");
+    }
+
     private Translation() {
     }
 
