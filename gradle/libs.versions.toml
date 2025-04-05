@@ -1,6 +1,6 @@
 [versions]
 adventure = "[4,5)"
-slf4j = "2.0.17"
+slf4j = "[2,3)"
 
 [libraries]
 annotations = "org.jetbrains:annotations:26.0.2"
