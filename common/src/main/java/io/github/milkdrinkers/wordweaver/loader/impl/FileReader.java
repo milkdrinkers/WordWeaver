@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 final class FileReader {
     static final Gson GSON = new GsonBuilder()
@@ -68,14 +70,14 @@ final class FileReader {
         try (
             final java.io.FileReader fileReader = new java.io.FileReader(file);
             final BufferedReader bufferedReader = new BufferedReader(fileReader);
-            final JsonReader jsonReader = GSON.newJsonReader(bufferedReader);
+            final JsonReader jsonReader = GSON.newJsonReader(bufferedReader)
         ) {
             final JsonObject jsonObject = JsonParser.parseReader(jsonReader).getAsJsonObject();
 
             if (jsonObject == null)
                 throw new LanguageLoadException("Failed to read json as it is malformed!");
 
-            return flatten(jsonObject);
+            return Parser.processAllEntries(flatten(jsonObject));
         } catch (JsonIOException e) {
             throw new LanguageLoadException("Failed to read json from reader!", e);
         } catch (JsonSyntaxException e) {
@@ -184,6 +186,120 @@ final class FileReader {
         // Store the complete array as a Translation with all values
         if (!arrayValues.isEmpty()) {
             translationMap.put(currentPath, new LanguageEntryImpl(LanguageEntry.Type.LIST, arrayValues));
+        }
+    }
+
+    static class Parser {
+        private static final Pattern KEY_PATTERN = Pattern.compile("<key:([^>]+)>");
+        private static final int MAX_RECURSION_DEPTH = 3;
+
+        /**
+         * Processes all LanguageEntries to resolve key references recursively.
+         *
+         * @param entries The original map of language entries
+         * @return A new map with resolved references
+         */
+        public static Map<String, LanguageEntry> processAllEntries(final Map<String, LanguageEntry> entries) {
+            final Map<String, LanguageEntry> processed = new HashMap<>(entries);
+
+            // Process each entry to resolve references
+            for (String key : entries.keySet()) {
+                processEntry(key, entries, processed, 0);
+            }
+
+            return processed;
+        }
+
+        /**
+         * Processes a single entry to resolve key references.
+         *
+         * @param key      The key of the entry to process
+         * @param original The original map of entries
+         * @param results  The map of processed entries
+         * @param depth    Current recursion depth
+         */
+        private static void processEntry(final String key, final Map<String, LanguageEntry> original, final Map<String, LanguageEntry> results, int depth) {
+            if (depth >= MAX_RECURSION_DEPTH)
+                return;
+
+            final LanguageEntry entry = results.get(key);
+            if (entry == null)
+                return;
+
+            boolean foundAnyKey = false;
+
+            if (entry.isCollection()) { // Handle LIST type entries
+                final List<String> processedValues = new ArrayList<>();
+
+                for (String value : entry.getValues()) {
+                    final StringBuffer processedValue = new StringBuffer();
+                    foundAnyKey = replaceKeysInString(value, processedValue, original, results, depth + 1);
+                    processedValues.add(processedValue.toString());
+                }
+
+                if (foundAnyKey) {
+                    results.put(key, new LanguageEntryImpl(LanguageEntry.Type.LIST, processedValues));
+                }
+            } else { // Handle STRING type entries
+                final StringBuffer processedValue = new StringBuffer();
+                foundAnyKey = replaceKeysInString(entry.getValue(), processedValue, original, results, depth + 1);
+
+                if (foundAnyKey) {
+                    results.put(key, new LanguageEntryImpl(LanguageEntry.Type.STRING, processedValue.toString()));
+                }
+            }
+
+            // If we found and replaced any keys, process again to handle nested replacements
+            if (foundAnyKey) {
+                processEntry(key, original, results, depth + 1);
+            }
+        }
+
+        /**
+         * Processes a single string to replace all key references.
+         *
+         * @param input    The string to process
+         * @param result   The buffer to append results to
+         * @param original The original map of entries
+         * @param results  The map of processed entries
+         * @param depth    Current recursion depth
+         * @return True if any keys were found and replaced
+         */
+        private static boolean replaceKeysInString(final String input, final StringBuffer result, final Map<String, LanguageEntry> original, final Map<String, LanguageEntry> results, int depth) {
+            boolean foundAnyKey = false;
+            final Matcher matcher = KEY_PATTERN.matcher(input);
+
+            while (matcher.find()) {
+                foundAnyKey = true;
+                final String fullMatch = matcher.group(0);
+                final String keyName = matcher.group(1);
+
+                final String replacement = getReplacementValue(keyName, fullMatch, original, results, depth + 1);
+                matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
+            }
+
+            matcher.appendTail(result);
+            return foundAnyKey;
+        }
+
+        /**
+         * Gets the replacement value for a key reference.
+         *
+         * @param keyName   The key name to replace
+         * @param fullMatch The full match string
+         * @param original  The original map of entries
+         * @param results   The map of processed entries
+         * @param depth     Current recursion depth
+         * @return The replacement value or the original match if not found
+         */
+        private static String getReplacementValue(final String keyName, final String fullMatch, final Map<String, LanguageEntry> original, final Map<String, LanguageEntry> results, int depth) {
+            if (original.containsKey(keyName)) { // If the referenced key exists, ensure it's processed
+                processEntry(keyName, original, results, depth + 1);
+
+                return results.get(keyName).getValue(); // Return the processed value
+            } else {
+                return fullMatch; // No replacement found, return the original match
+            }
         }
     }
 }
