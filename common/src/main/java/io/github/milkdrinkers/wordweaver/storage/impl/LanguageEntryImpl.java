@@ -27,7 +27,7 @@ public class LanguageEntryImpl implements LanguageEntry {
         values.forEach(s -> {
             builder.append(s);
             if (!s.isEmpty())
-                builder.append(System.lineSeparator());
+                builder.append("\n");
         });
 
         this.value = builder.toString();
