@@ -165,7 +165,7 @@ final class FileReader {
         // Store individual elements with array indices
         for (int i = 0; i < jsonArray.size(); i++) {
             final JsonElement arrayElement = jsonArray.get(i);
-            final String internalPath = String.format("%s[%d]", currentPath, i);
+            final String internalPath = String.format("%s.%d", currentPath, i + 1);
 
             if (arrayElement.isJsonPrimitive()) {
                 final String arrayValue = arrayElement.getAsString();
