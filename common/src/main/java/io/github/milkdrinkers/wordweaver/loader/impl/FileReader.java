@@ -139,7 +139,7 @@ final class FileReader {
         final JsonObject jsonObject = element.getAsJsonObject();
 
         for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-            final String internalPath = String.format("%s.%s", currentPath, entry.getKey());
+            final String internalPath = currentPath.isEmpty() ? entry.getKey() : String.format("%s.%s", currentPath, entry.getKey());
 
             // Recursively flatten
             flattenJsonElement(internalPath, entry.getValue(), translationMap);
