@@ -5,7 +5,7 @@ slf4j = "[2,3)"
 [libraries]
 annotations = "org.jetbrains:annotations:26.0.2"
 adventure = { module = "net.kyori:adventure-api", version.ref = "adventure" }
-gson = "com.google.code.gson:gson:2.13.0"
+gson = "com.google.code.gson:gson:2.13.1"
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 junit-bom = "org.junit:junit-bom:5.12.2"
