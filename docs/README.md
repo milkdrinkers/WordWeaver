@@ -25,15 +25,15 @@ A modern Java translation library designed for effortless localization managemen
 ---
 
 ## 🌟 Features
-- 🎯 **Easy Integration** - Simple API with minimal setup
-- 🛠 **Highly Configurable** - Customize every aspect of the library
-- 🧵 **Thread-Safe** - Designed for concurrent environments
-- ⚡ **Optimized** - Resource efficient with a small memory footprint while providing excellent speed
-- 📚 **Adventure 4+ Support** - Native integration for modern text components
-- ⏱️ **Java 8+ Compatibility** - Supports legacy and modern java versions
-- ✅ **Tested** - Comprehensive unit test coverage
-- 📄 **JSON** - Easy to edit language files using Json with comments
-- 🔍 **Advanced Features** - Comes with optional advanced features like language file extractor and updater
+- **Easy Integration** - Simple API with minimal setup
+- **Highly Configurable** - Customize every aspect of the library
+- **Thread-Safe** - Designed for concurrent environments
+- **Optimized** - Resource efficient with a small memory footprint while providing excellent speed
+- **Adventure 4+ Support** - Native integration for modern text components
+- **Java 8+ Compatibility** - Supports legacy and modern java versions
+- **Tested** - Comprehensive unit test coverage
+- **JSON** - Easy to edit language files using Json with comments
+- **Advanced Features** - Comes with optional advanced features like language file extractor and updater
 
 ## 📦 Installation
 
