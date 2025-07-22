@@ -7,17 +7,23 @@
     <a href="https://central.sonatype.com/artifact/io.github.milkdrinkers/wordweaver">
         <img alt="Maven Central Version" src="https://img.shields.io/maven-central/v/io.github.milkdrinkers/wordweaver?style=for-the-badge&labelColor=141417">
     </a>
+    <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/milkdrinkers/WordWeaver/ci.yml?style=for-the-badge&labelColor=141417">
+    <a href="https://github.com/milkdrinkers/WordWeaver/issues">
+        <img alt="GitHub Issues" src="https://img.shields.io/github/issues/milkdrinkers/WordWeaver?style=for-the-badge&labelColor=141417">
+    </a>
+    <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/milkdrinkers/WordWeaver?style=for-the-badge&labelColor=141417">
+</p>
+
+<p style="text-align:center;">
     <a href="https://milkdrinkers.athyrium.eu/wordweaver">
         <img alt="Documentation" src="https://img.shields.io/badge/DOCUMENTATION-900C3F?style=for-the-badge&labelColor=141417">
     </a>
     <a href="https://javadoc.io/doc/io.github.milkdrinkers/wordweaver">
         <img alt="Javadoc" src="https://img.shields.io/badge/JAVADOC-8A2BE2?style=for-the-badge&labelColor=141417">
     </a>
-    <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/milkdrinkers/WordWeaver/ci.yml?style=for-the-badge&labelColor=141417">
-    <a href="https://github.com/milkdrinkers/WordWeaver/issues">
-        <img alt="GitHub Issues" src="https://img.shields.io/github/issues/milkdrinkers/WordWeaver?style=for-the-badge&labelColor=141417">
+    <a href="https://discord.gg/cG5uWvUcM6">
+        <img alt="Discord Server" src="https://img.shields.io/discord/1008300159333040158?style=for-the-badge&logo=discord&logoColor=ffffff&label=discord&labelColor=141417&color=%235865F2">
     </a>
-    <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/milkdrinkers/WordWeaver?style=for-the-badge&labelColor=141417">
 </p>
 
 A modern Java translation library designed for effortless localization management in Java applications.
