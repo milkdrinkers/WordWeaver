@@ -1,7 +1,5 @@
 <h1 style="text-align:center;">WordWeaver</h1>
 
-![code image](image.png)
-
 <p style="text-align:center;">
     <a href="https://github.com/milkdrinkers/WordWeaver/blob/main/LICENSE">
         <img alt="GitHub License" src="https://img.shields.io/github/license/milkdrinkers/WordWeaver?style=for-the-badge&color=blue&labelColor=141417">
@@ -31,6 +29,8 @@
 A modern Java translation library designed for effortless localization management in Java applications.
 
 ---
+
+![code image](image.png)
 
 ## 🌟 Features
 - **Easy Integration** - Simple API with minimal setup
