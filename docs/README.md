@@ -147,3 +147,13 @@ We also ask that you adhere to our [Contributor Code of Conduct](CODE_OF_CONDUCT
 ## 📝 Licensing
 
 You can find the license the source code and all assets are under [here](../LICENSE). Additionally, contributors agree to the Contributor License Agreement \(*CLA*\) found [here](CONTRIBUTOR_LICENSE_AGREEMENT.md).
+
+---
+
+## 🔥 Consuming Projects
+
+Here is a list of known projects using WordWeaver:
+- [Minecraft-Plugin-Template](https://github.com/milkdrinkers/Minecraft-Plugin-Template) - *Provided by default in a Minecraft Plugin Template.*
+- [Maquillage](https://github.com/milkdrinkers/Maquillage) - *Maquillage a Minecraft cosmetics plugin.*
+- [CharacterCards](https://github.com/Alathra/CharacterCards) - *CharacterCards is a Minecraft plugin allowing players to create cards describing their character.*
+- (*Add your project here!*)
