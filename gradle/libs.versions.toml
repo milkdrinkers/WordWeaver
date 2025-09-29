@@ -17,4 +17,4 @@ junit = ["junit-jupiter", "junit-platform"]
 
 [plugins]
 publisher = "com.vanniktech.maven.publish:0.34.0"
-shadow = "com.gradleup.shadow:9.2.1"
+shadow = "com.gradleup.shadow:9.2.2"
