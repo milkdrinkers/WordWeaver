@@ -8,7 +8,7 @@ adventure = { module = "net.kyori:adventure-api", version.ref = "adventure" }
 gson = "com.google.code.gson:gson:2.13.2"
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
-junit-bom = "org.junit:junit-bom:6.0.1"
+junit-bom = "org.junit:junit-bom:6.0.2"
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
 junit-platform = { module = "org.junit.platform:junit-platform-launcher" }
 
