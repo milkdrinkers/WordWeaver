@@ -18,7 +18,7 @@
 <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/milkdrinkers/WordWeaver?style=for-the-badge&labelColor=141417">
 <br>
 
-<a href="https://milkdrinkers.athyrium.eu/wordweaver">
+<a href="https://docs.milkdrinkers.dev/wordweaver">
     <img alt="Documentation" src="https://img.shields.io/badge/DOCUMENTATION-900C3F?style=for-the-badge&labelColor=141417">
 </a>
 <a href="https://javadoc.io/doc/io.github.milkdrinkers/wordweaver">
@@ -127,7 +127,7 @@ Example `en_US.json`:
 ## 📚 Documentation
 
 - [Full Javadoc Documentation](https://javadoc.io/doc/io.github.milkdrinkers/wordweaver)
-- [Documentation](https://milkdrinkers.athyrium.eu/wordweaver)
+- [Documentation](https://docs.milkdrinkers.dev/wordweaver)
 - [Maven Central](https://central.sonatype.com/search?q=wordweaver&namespace=io.github.milkdrinkers)
 
 ---
