@@ -1,8 +1,10 @@
 import com.vanniktech.maven.publish.JavaLibrary
 import com.vanniktech.maven.publish.JavadocJar
+import org.gradle.internal.extensions.stdlib.capitalized
 
 plugins {
     alias(libs.plugins.publisher)
+    signing
 }
 
 dependencies {
@@ -27,7 +29,7 @@ tasks.shadowJar {
 mavenPublishing {
     coordinates(
         groupId = "io.github.milkdrinkers",
-        artifactId = "wordweaver",
+        artifactId = project.rootProject.name.lowercase(),
         version = version.toString().let { originalVersion ->
             if (!originalVersion.contains("-SNAPSHOT"))
                 originalVersion
@@ -37,7 +39,7 @@ mavenPublishing {
     )
 
     pom {
-        name.set(rootProject.name)
+        name.set(rootProject.name.capitalized())
         description.set(rootProject.description.orEmpty())
         url.set("https://github.com/milkdrinkers/WordWeaver")
         inceptionYear.set("2025")
@@ -75,7 +77,8 @@ mavenPublishing {
 
     // Sign all publications
     signAllPublications()
+}
 
-    // Skip signing for local tasks
-    tasks.withType<Sign>().configureEach { onlyIf { !gradle.taskGraph.allTasks.any { it is PublishToMavenLocal } } }
+signing {
+    isRequired = false // Skip signing if no credentials are provided, e.g. for local publishing
 }
