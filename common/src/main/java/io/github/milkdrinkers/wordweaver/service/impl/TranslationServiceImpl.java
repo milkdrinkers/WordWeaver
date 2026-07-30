@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -44,13 +45,8 @@ public class TranslationServiceImpl implements TranslationService {
     }
 
     @Override
-    public String getString(String key) {
-        return getString(key, null);
-    }
-
-    @Override
-    public String getString(String key, @Nullable String fallback) {
-        final Language language = registry.getCurrent();
+    public String getString(Locale locale, String key, @Nullable String fallback) {
+        final Language language = registry.get(locale);
         if (language == null)
             return config.getMissingTranslationHandler().handle(config, registry, key, fallback);
 
@@ -62,13 +58,8 @@ public class TranslationServiceImpl implements TranslationService {
     }
 
     @Override
-    public List<String> getStringList(String key) {
-        return getStringList(key, null);
-    }
-
-    @Override
-    public List<String> getStringList(String key, List<String> fallback) {
-        final Language language = registry.getCurrent();
+    public List<String> getStringList(Locale locale, String key, List<String> fallback) {
+        final Language language = registry.get(locale);
         if (language == null)
             return config.getMissingTranslationHandler().handleListString(config, registry, key, fallback);
 
@@ -80,13 +71,8 @@ public class TranslationServiceImpl implements TranslationService {
     }
 
     @Override
-    public Component getComponent(String key) {
-        return getComponent(key, null);
-    }
-
-    @Override
-    public Component getComponent(String key, Component fallback) {
-        final Language language = registry.getCurrent();
+    public Component getComponent(Locale locale, String key, Component fallback) {
+        final Language language = registry.get(locale);
         if (language == null)
             return config.getMissingTranslationHandler().handle(config, registry, key, (Component) null);
 
@@ -98,13 +84,8 @@ public class TranslationServiceImpl implements TranslationService {
     }
 
     @Override
-    public List<Component> getComponentList(String key) {
-        return getComponentList(key, null);
-    }
-
-    @Override
-    public List<Component> getComponentList(String key, List<Component> fallback) {
-        final Language language = registry.getCurrent();
+    public List<Component> getComponentList(Locale locale, String key, List<Component> fallback) {
+        final Language language = registry.get(locale);
         if (language == null)
             return config.getMissingTranslationHandler().handleListComponent(config, registry, key, null);
 
@@ -123,23 +104,23 @@ public class TranslationServiceImpl implements TranslationService {
     }
 
     @Override
-    public void setDefaultLanguage(String language) {
+    public void setDefaultLocale(Locale language) {
         config.setDefaultLanguage(language);
     }
 
     @Override
-    public String getDefaultLanguage() {
-        return config.getDefaultLanguage();
+    public Locale getDefaultLocale() {
+        return config.getDefaultLocale();
     }
 
     @Override
-    public void setLanguage(String language) {
+    public void setLocale(Locale language) {
         config.setCurrentLanguage(language);
     }
 
     @Override
-    public String getLanguage() {
-        return config.getCurrentLanguage();
+    public Locale getLocale() {
+        return config.getCurrentLocale();
     }
 
     @Override

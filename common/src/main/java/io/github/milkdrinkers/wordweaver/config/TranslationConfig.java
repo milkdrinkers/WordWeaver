@@ -5,18 +5,21 @@ import net.kyori.adventure.text.Component;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Locale;
 import java.util.function.Function;
+
+import static io.github.milkdrinkers.wordweaver.LocaleUtil.*;
 
 /**
  * Configuration for WordWeaver
  */
 public class TranslationConfig {
-    public static final String DEFAULT_LANG = "en_US";
+    public static final Locale DEFAULT_LANG = Locale.US;
 
     // Configuration
     private Path languagesDirectory;
-    private String defaultLanguage;
-    private String currentLanguage;
+    private Locale defaultLanguage;
+    private Locale currentLanguage;
 
     private Path resourcesDirectory;
     private boolean extractLanguages;
@@ -44,18 +47,26 @@ public class TranslationConfig {
     }
 
     public String getDefaultLanguage() {
+        return deserialize(defaultLanguage);
+    }
+
+    public Locale getDefaultLocale() {
         return defaultLanguage;
     }
 
-    public void setDefaultLanguage(String defaultLanguage) {
+    public void setDefaultLanguage(Locale defaultLanguage) {
         this.defaultLanguage = defaultLanguage;
     }
 
     public String getCurrentLanguage() {
+        return deserialize(currentLanguage);
+    }
+
+    public Locale getCurrentLocale() {
         return currentLanguage;
     }
 
-    public void setCurrentLanguage(String currentLanguage) {
+    public void setCurrentLanguage(Locale currentLanguage) {
         this.currentLanguage = currentLanguage;
     }
 
@@ -110,22 +121,44 @@ public class TranslationConfig {
         /**
          * Sets the default language to use, this is used as a fallback if a key cannot be found in the requested language.
          *
-         * @param language The language code like <a href="https://minecraft.gamepedia.com/Language">Minecraft Wiki</a> (e.g., "en_US", "xx_XX").
+         * @param language The <a href="https://gist.github.com/typpo/b2b828a35e683b9bf8db91b5404f1bd1">BCP 47 Language Code</a> (e.g., "en-US", "xx-XX", "en_US", "xx_XX"), representing a language.
          * @implNote Defaults to {@code en_US}
+         * @see #defaultLanguage(Locale)
          */
         public Builder defaultLanguage(String language) {
-            config.defaultLanguage = language;
+            return defaultLanguage(serialize(language));
+        }
+
+        /**
+         * Sets the default language to use by specifying a Locale, this is used as a fallback if a key cannot be found in the requested language.
+         *
+         * @param locale A Locale representing a language (e.g., {@code Locale.forLanguageTag("en-US")}, {@code new Locale("en", "US")}, {@code new Locale("xx", "XX")}).
+         * @implNote Defaults to {@code Locale.US}
+         */
+        public Builder defaultLanguage(Locale locale) {
+            config.defaultLanguage = locale;
             return this;
         }
 
         /**
          * Sets the language to use
          *
-         * @param language The language code like <a href="https://minecraft.gamepedia.com/Language">Minecraft Wiki</a> (e.g., "en_US", "xx_XX").
+         * @param language The <a href="https://gist.github.com/typpo/b2b828a35e683b9bf8db91b5404f1bd1">BCP 47 Language Code</a> (e.g., "en-US", "xx-XX", "en_US", "xx_XX"), representing a language.
          * @implNote Defaults to the value of {@link #defaultLanguage(String)}
+         * @see #language(Locale)
          */
         public Builder language(String language) {
-            config.currentLanguage = language;
+            return language(serialize(language));
+        }
+
+        /**
+         * Sets the language to use by specifying a Locale
+         *
+         * @param locale A Locale representing the language to use (e.g., {@code Locale.forLanguageTag("en-US")}, {@code new Locale("en", "US")}, {@code new Locale("xx", "XX")}).
+         * @implNote Defaults to the value of {@link #defaultLanguage(Locale)}
+         */
+        public Builder language(Locale locale) {
+            config.currentLanguage = locale;
             return this;
         }
 
@@ -194,10 +227,10 @@ public class TranslationConfig {
             if (config.languagesDirectory == null)
                 throw new IllegalStateException("Translation directory must be set");
 
-            if (config.defaultLanguage == null || config.defaultLanguage.isEmpty())
+            if (config.defaultLanguage == null)
                 config.defaultLanguage = DEFAULT_LANG;
 
-            if (config.currentLanguage == null || config.currentLanguage.isEmpty())
+            if (config.currentLanguage == null)
                 config.currentLanguage = config.defaultLanguage;
 
             if (config.resourcesDirectory == null)

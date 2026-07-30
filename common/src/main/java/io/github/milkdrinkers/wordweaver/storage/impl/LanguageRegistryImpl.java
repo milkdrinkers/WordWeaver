@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class LanguageRegistryImpl implements LanguageRegistry {
-    private final AtomicReference<Map<String, Language>> languages;
+    private final AtomicReference<Map<Locale, Language>> languages;
     private final AtomicReference<Set<String>> keys;
     private final TranslationConfig config;
 
@@ -25,13 +25,13 @@ public class LanguageRegistryImpl implements LanguageRegistry {
     }
 
     @Override
-    public @Nullable Language get(String name) {
-        return languages.get().get(name);
+    public @Nullable Language get(Locale locale) {
+        return languages.get().get(locale);
     }
 
     @Override
-    public Optional<Language> getOptional(String name) {
-        return Optional.ofNullable(get(name));
+    public Optional<Language> getOptional(Locale locale) {
+        return Optional.ofNullable(get(locale));
     }
 
     @Override
@@ -55,13 +55,13 @@ public class LanguageRegistryImpl implements LanguageRegistry {
     }
 
     @Override
-    public Set<String> getRegistered() {
+    public Set<Locale> getRegistered() {
         return Collections.unmodifiableSet(languages.get().keySet());
     }
 
     @Override
-    public boolean isRegistered(String name) {
-        return languages.get().containsKey(name);
+    public boolean isRegistered(Locale locale) {
+        return languages.get().containsKey(locale);
     }
 
     @Override
@@ -72,18 +72,18 @@ public class LanguageRegistryImpl implements LanguageRegistry {
     @Override
     public void register(Language language) {
         // Update languages map
-        final Map<String, Language> updatedLanguages = new HashMap<>(languages.get());
-        updatedLanguages.putIfAbsent(language.getName(), language);
+        final Map<Locale, Language> updatedLanguages = new HashMap<>(languages.get());
+        updatedLanguages.putIfAbsent(language.getLocale(), language);
         languages.set(Collections.unmodifiableMap(updatedLanguages));
 
         // Update keys map
         final Set<String> updatedKeys = new HashSet<>(getKeys());
 
         // Cache the new language ref
-        final Language newLanguage = updatedLanguages.get(language.getName());
+        final Language newLanguage = updatedLanguages.get(language.getLocale());
 
         // Update current language if necessary
-        if (currentLanguage.get() == null && language.getName().equals(config.getCurrentLanguage())) {
+        if (currentLanguage.get() == null && language.getLocale().equals(config.getCurrentLocale())) {
             currentLanguage.set(newLanguage);
 
             if (newLanguage != null)
@@ -91,7 +91,7 @@ public class LanguageRegistryImpl implements LanguageRegistry {
         }
 
         // Update default language if necessary
-        if (defaultLanguage.get() == null && language.getName().equals(config.getDefaultLanguage())) {
+        if (defaultLanguage.get() == null && language.getLocale().equals(config.getDefaultLocale())) {
             defaultLanguage.set(newLanguage);
 
             if (newLanguage != null)

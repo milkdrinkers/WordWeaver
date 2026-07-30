@@ -2,6 +2,7 @@ package io.github.milkdrinkers.wordweaver.storage;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -18,12 +19,11 @@ import java.util.Set;
  */
 public interface Language {
     /**
-     * Get the name of this language
+     * Get the locale of this language
      *
-     * @return The name of this language
-     * @implNote Follows naming convention from <a href="https://minecraft.gamepedia.com/Language">Minecraft Wiki</a>. Ie, (xx_XX).
+     * @return The locale of this language
      */
-    String getName();
+    Locale getLocale();
 
     /**
      * Get the entries in this language

@@ -16,6 +16,8 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static io.github.milkdrinkers.wordweaver.LocaleUtil.*;
+
 /**
  * Loads translations from JSON/JSONC files
  */
@@ -76,7 +78,7 @@ public class JsonTranslationLoader implements TranslationLoader {
             final String language = filename.substring(0, filename.lastIndexOf('.'));
             final Map<String, LanguageEntry> translations = FileReader.readFile(file);
 
-            final Language languageFile = new LanguageImpl(language, translations);
+            final Language languageFile = new LanguageImpl(serialize(language), translations);
 
             registry.register(languageFile);
         } catch (LanguageLoadException e) {

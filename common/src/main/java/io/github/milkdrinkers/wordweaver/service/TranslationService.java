@@ -3,49 +3,98 @@ package io.github.milkdrinkers.wordweaver.service;
 import net.kyori.adventure.text.Component;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 /**
  * Service interface for translation functionality
  */
 public interface TranslationService {
-    String getString(String key);
+    @SuppressWarnings("unused")
+    default String getString(String key) {
+        return getString(key, null);
+    }
 
-    String getString(String key, String fallback);
+    default String getString(String key, String fallback) {
+        return getString(getLocale(), key, fallback);
+    }
 
-    List<String> getStringList(String key);
+    @SuppressWarnings("unused")
+    default List<String> getStringList(String key) {
+        return getStringList(key, null);
+    }
 
-    List<String> getStringList(String key, List<String> fallback);
+    default List<String> getStringList(String key, List<String> fallback) {
+        return getStringList(getLocale(), key, fallback);
+    }
 
-    Component getComponent(String key);
+    @SuppressWarnings("unused")
+    default Component getComponent(String key) {
+        return getComponent(key, null);
+    }
 
-    Component getComponent(String key, Component fallback);
+    default Component getComponent(String key, Component fallback) {
+        return getComponent(getLocale(), key, fallback);
+    }
 
-    List<Component> getComponentList(String key);
+    @SuppressWarnings("unused")
+    default List<Component> getComponentList(String key) {
+        return getComponentList(key, null);
+    }
 
-    List<Component> getComponentList(String key, List<Component> fallback);
+    default List<Component> getComponentList(String key, List<Component> fallback) {
+        return getComponentList(getLocale(), key, fallback);
+    }
+
+    @SuppressWarnings("unused")
+    default String getString(Locale locale, String key) {
+        return getString(locale, key, null);
+    }
+
+    String getString(Locale locale, String key, String fallback);
+
+    @SuppressWarnings("unused")
+    default List<String> getStringList(Locale locale, String key) {
+        return getStringList(locale, key, null);
+    }
+
+    List<String> getStringList(Locale locale, String key, List<String> fallback);
+
+    @SuppressWarnings("unused")
+    default Component getComponent(Locale locale, String key) {
+        return getComponent(locale, key, null);
+    }
+
+    Component getComponent(Locale locale, String key, Component fallback);
+
+    @SuppressWarnings("unused")
+    default List<Component> getComponentList(Locale locale, String key) {
+        return getComponentList(locale, key, null);
+    }
+
+    List<Component> getComponentList(Locale locale, String key, List<Component> fallback);
 
     Set<String> getKeys();
 
     /**
-     * Set the default/fallback language
+     * Set the default/fallback locale
      */
-    void setDefaultLanguage(String language);
+    void setDefaultLocale(Locale language);
 
     /**
-     * Get the default/fallback language
+     * Get the default/fallback locale
      */
-    String getDefaultLanguage();
+    Locale getDefaultLocale();
 
     /**
-     * Set the active language
+     * Set the active locale
      */
-    void setLanguage(String language);
+    void setLocale(Locale language);
 
     /**
-     * Get the active language
+     * Get the active locale
      */
-    String getLanguage();
+    Locale getLocale();
 
     /**
      * Reload all translations

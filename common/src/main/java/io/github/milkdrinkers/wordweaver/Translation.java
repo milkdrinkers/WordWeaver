@@ -15,7 +15,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
+
+import static io.github.milkdrinkers.wordweaver.LocaleUtil.*;
 
 /**
  * Main API interface for accessing WordWeaver translations.
@@ -126,33 +129,65 @@ public final class Translation {
     /**
      * Set the default/fallback language
      *
-     * @param language The language code like <a href="https://minecraft.gamepedia.com/Language">Minecraft Wiki</a> (e.g., "en_US", "xx_XX")
+     * @param language The <a href="https://gist.github.com/typpo/b2b828a35e683b9bf8db91b5404f1bd1">BCP 47 Language Code</a> (e.g., "en-US", "xx-XX", "en_US", "xx_XX"), representing a language.
      */
     public static void setDefaultLanguage(@NotNull String language) {
-        TranslationProvider.getInstance().getTranslationService().setDefaultLanguage(language);
+        setDefaultLanguage(serialize(language));
+    }
+
+    /**
+     * Set the default/fallback language
+     *
+     * @param locale A Locale representing a language (e.g., {@code Locale.forLanguageTag("en-US")}, {@code new Locale("en", "US")}, {@code new Locale("xx", "XX")}).
+     */
+    public static void setDefaultLanguage(@NotNull Locale locale) {
+        TranslationProvider.getInstance().getTranslationService().setDefaultLocale(locale);
     }
 
     /**
      * Get the default/fallback language
      */
     public static String getDefaultLanguage() {
-        return TranslationProvider.getInstance().getTranslationService().getDefaultLanguage();
+        return deserialize(getDefaultLocale());
+    }
+
+    /**
+     * Get the default/fallback language
+     */
+    public static Locale getDefaultLocale() {
+        return TranslationProvider.getInstance().getTranslationService().getDefaultLocale();
     }
 
     /**
      * Set the active language
      *
-     * @param language The language code like <a href="https://minecraft.gamepedia.com/Language">Minecraft Wiki</a> (e.g., "en_US", "xx_XX")
+     * @param language The <a href="https://gist.github.com/typpo/b2b828a35e683b9bf8db91b5404f1bd1">BCP 47 Language Code</a> (e.g., "en-US", "xx-XX", "en_US", "xx_XX"), representing a language.
      */
     public static void setLanguage(@NotNull String language) {
-        TranslationProvider.getInstance().getTranslationService().setLanguage(language);
+        setLanguage(serialize(language));
+    }
+
+    /**
+     * Set the active language
+     *
+     * @param locale A Locale representing the language to use (e.g., {@code Locale.forLanguageTag("en-US")}, {@code new Locale("en", "US")}, {@code new Locale("xx", "XX")}).
+     */
+    public static void setLanguage(@NotNull Locale locale) {
+        TranslationProvider.getInstance().getTranslationService().setLocale(locale);
     }
 
     /**
      * Get the active language
      */
     public static String getLanguage() {
-        return TranslationProvider.getInstance().getTranslationService().getLanguage();
+        return deserialize(getLocale());
+    }
+
+    /**
+     * Get the active language
+     */
+    public static Locale getLocale() {
+        return TranslationProvider.getInstance().getTranslationService().getLocale();
     }
 
     /**

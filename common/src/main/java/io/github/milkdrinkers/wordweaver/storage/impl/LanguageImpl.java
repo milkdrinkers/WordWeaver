@@ -7,17 +7,17 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class LanguageImpl implements Language {
-    private final String languageName;
+    private final Locale locale;
     private final Map<String, LanguageEntry> translations;
 
-    public LanguageImpl(final String languageName, final Map<String, LanguageEntry> translations) {
-        this.languageName = languageName;
+    public LanguageImpl(final Locale locale, final Map<String, LanguageEntry> translations) {
+        this.locale = locale;
         this.translations = Collections.unmodifiableMap(new HashMap<>(translations));
     }
 
     @Override
-    public String getName() {
-        return languageName;
+    public Locale getLocale() {
+        return locale;
     }
 
     @Override

@@ -2,6 +2,7 @@ package io.github.milkdrinkers.wordweaver.storage;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 
@@ -14,20 +15,20 @@ import java.util.Set;
  */
 public interface LanguageRegistry {
     /**
-     * Get the language with the given name
+     * Get the language with the given locale
      *
-     * @param name The name of the language
-     * @return The language with the given name
+     * @param locale The locale of the language
+     * @return The language with the given locale
      */
-    @Nullable Language get(String name);
+    @Nullable Language get(Locale locale);
 
     /**
-     * Get the language with the given name
+     * Get the language with the given locale
      *
-     * @param name The name of the language
-     * @return The language with the given name
+     * @param locale The locale of the language
+     * @return The language with the given locale
      */
-    Optional<Language> getOptional(String name);
+    Optional<Language> getOptional(Locale locale);
 
     /**
      * Get the current language
@@ -58,19 +59,19 @@ public interface LanguageRegistry {
     Optional<Language> getDefaultOptional();
 
     /**
-     * Get the names of all registered languages
+     * Get the locales of all registered languages
      *
-     * @return The names of all registered languages
+     * @return The locales of all registered languages
      */
-    Set<String> getRegistered();
+    Set<Locale> getRegistered();
 
     /**
-     * Check if a language with the given name is registered
+     * Check if a language with the given locale is registered
      *
-     * @param name The name of the language
+     * @param locale The locale of the language
      * @return Whether the language is registered
      */
-    boolean isRegistered(String name);
+    boolean isRegistered(Locale locale);
 
     /**
      * Get a cached, combined {@link Set} of all the {@link LanguageEntry} keys in the registered current {@literal &} default languages
