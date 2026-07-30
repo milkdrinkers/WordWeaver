@@ -1,29 +1,29 @@
 package io.github.milkdrinkers.wordweaver.loader;
 
-import io.github.milkdrinkers.wordweaver.storage.Language;
-import io.github.milkdrinkers.wordweaver.storage.LanguageRegistry;
+import io.github.milkdrinkers.wordweaver.storage.TranslationBundle;
+import io.github.milkdrinkers.wordweaver.storage.TranslationBundleRegistry;
 
 import java.io.IOException;
 
 /**
- * Interface for loading language files from various sources
+ * Interface for loading bundles from various sources
  *
- * @see LanguageRegistry
- * @see Language
+ * @see TranslationBundleRegistry
+ * @see TranslationBundle
  */
 public interface TranslationLoader {
     /**
-     * Extract missing language files from .jar resources
+     * Extract missing bundle files from .jar resources
      */
-    void extractMissingLanguages() throws IOException;
+    void extractMissingBundles() throws IOException;
 
     /**
-     * Update existing language files with missing translations entries
+     * Update existing bundle files with missing entries
      */
-    void updateExistingLanguages() throws IOException;
+    void updateExistingBundles() throws IOException;
 
     /**
-     * Load language files from configured sources
+     * Load bundle files from configured sources
      */
-    void loadLanguages() throws IOException;
+    void loadBundles() throws IOException;
 }

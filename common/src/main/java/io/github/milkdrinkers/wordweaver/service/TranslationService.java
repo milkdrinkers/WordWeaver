@@ -79,7 +79,7 @@ public interface TranslationService {
     /**
      * Set the default/fallback locale
      */
-    void setDefaultLocale(Locale language);
+    void setDefaultLocale(Locale locale);
 
     /**
      * Get the default/fallback locale
@@ -89,7 +89,7 @@ public interface TranslationService {
     /**
      * Set the active locale
      */
-    void setLocale(Locale language);
+    void setLocale(Locale locale);
 
     /**
      * Get the active locale

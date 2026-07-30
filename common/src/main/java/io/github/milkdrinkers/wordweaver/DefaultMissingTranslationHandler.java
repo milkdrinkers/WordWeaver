@@ -1,9 +1,9 @@
 package io.github.milkdrinkers.wordweaver;
 
 import io.github.milkdrinkers.wordweaver.config.TranslationConfig;
-import io.github.milkdrinkers.wordweaver.storage.Language;
-import io.github.milkdrinkers.wordweaver.storage.LanguageEntry;
-import io.github.milkdrinkers.wordweaver.storage.LanguageRegistry;
+import io.github.milkdrinkers.wordweaver.storage.TranslationBundle;
+import io.github.milkdrinkers.wordweaver.storage.TranslationBundleEntry;
+import io.github.milkdrinkers.wordweaver.storage.TranslationBundleRegistry;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -27,14 +27,14 @@ public class DefaultMissingTranslationHandler implements MissingTranslationHandl
     }
 
     @Override
-    public @Nullable String handle(TranslationConfig config, LanguageRegistry registry, String key, @Nullable String fallback) {
-        LOGGER.debug("Missing translation for key: '{}' in language: '{}'", key, config.getCurrentLanguage());
+    public @Nullable String handle(TranslationConfig config, TranslationBundleRegistry registry, String key, @Nullable String fallback) {
+        LOGGER.debug("Missing translation for key: '{}' in locale: '{}'", key, config.getCurrentLocaleTag());
 
-        final Optional<Language> languageFile = registry.getDefaultOptional();
-        if (!languageFile.isPresent())
+        final Optional<TranslationBundle> bundle = registry.getDefaultOptional();
+        if (!bundle.isPresent())
             return stringResultHandler.apply(fallback);
 
-        final Optional<LanguageEntry> value = languageFile.get().getOptional(key);
+        final Optional<TranslationBundleEntry> value = bundle.get().getEntryOptional(key);
         if (!value.isPresent())
             return stringResultHandler.apply(fallback);
 
@@ -42,14 +42,14 @@ public class DefaultMissingTranslationHandler implements MissingTranslationHandl
     }
 
     @Override
-    public @Nullable Component handle(TranslationConfig config, LanguageRegistry registry, String key, @Nullable Component fallback) {
-        LOGGER.debug("Missing translation for key: '{}' in language: '{}'", key, config.getCurrentLanguage());
+    public @Nullable Component handle(TranslationConfig config, TranslationBundleRegistry registry, String key, @Nullable Component fallback) {
+        LOGGER.debug("Missing translation for key: '{}' in locale: '{}'", key, config.getCurrentLocaleTag());
 
-        final Optional<Language> languageFile = registry.getDefaultOptional();
-        if (!languageFile.isPresent())
+        final Optional<TranslationBundle> bundle = registry.getDefaultOptional();
+        if (!bundle.isPresent())
             return componentResultHandler.apply(fallback);
 
-        final Optional<LanguageEntry> value = languageFile.get().getOptional(key);
+        final Optional<TranslationBundleEntry> value = bundle.get().getEntryOptional(key);
         if (!value.isPresent())
             return componentResultHandler.apply(fallback);
 
@@ -57,14 +57,14 @@ public class DefaultMissingTranslationHandler implements MissingTranslationHandl
     }
 
     @Override
-    public @Nullable List<String> handleListString(TranslationConfig config, LanguageRegistry registry, String key, @Nullable List<String> fallback) {
-        LOGGER.debug("Missing translation for key: '{}' in language: '{}'", key, config.getCurrentLanguage());
+    public @Nullable List<String> handleListString(TranslationConfig config, TranslationBundleRegistry registry, String key, @Nullable List<String> fallback) {
+        LOGGER.debug("Missing translation for key: '{}' in locale: '{}'", key, config.getCurrentLocaleTag());
 
-        final Optional<Language> languageFile = registry.getDefaultOptional();
-        if (!languageFile.isPresent())
+        final Optional<TranslationBundle> bundle = registry.getDefaultOptional();
+        if (!bundle.isPresent())
             return stringResultHandler2.apply(fallback);
 
-        final Optional<LanguageEntry> value = languageFile.get().getOptional(key);
+        final Optional<TranslationBundleEntry> value = bundle.get().getEntryOptional(key);
         if (!value.isPresent())
             return stringResultHandler2.apply(fallback);
 
@@ -73,14 +73,14 @@ public class DefaultMissingTranslationHandler implements MissingTranslationHandl
 
     @SuppressWarnings("OptionalIsPresent")
     @Override
-    public @Nullable List<Component> handleListComponent(TranslationConfig config, LanguageRegistry registry, String key, @Nullable List<Component> fallback) {
-        LOGGER.debug("Missing translation for key: '{}' in language: '{}'", key, config.getCurrentLanguage());
+    public @Nullable List<Component> handleListComponent(TranslationConfig config, TranslationBundleRegistry registry, String key, @Nullable List<Component> fallback) {
+        LOGGER.debug("Missing translation for key: '{}' in locale: '{}'", key, config.getCurrentLocaleTag());
 
-        final Optional<Language> languageFile = registry.getDefaultOptional();
-        if (!languageFile.isPresent())
+        final Optional<TranslationBundle> bundle = registry.getDefaultOptional();
+        if (!bundle.isPresent())
             return componentResultHandler2.apply(fallback);
 
-        final Optional<LanguageEntry> value = languageFile.get().getOptional(key);
+        final Optional<TranslationBundleEntry> value = bundle.get().getEntryOptional(key);
         if (!value.isPresent())
             return componentResultHandler2.apply(fallback);
 

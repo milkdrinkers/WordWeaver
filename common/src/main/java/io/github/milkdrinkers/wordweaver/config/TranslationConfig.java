@@ -11,23 +11,24 @@ import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.function.Function;
 
-import static io.github.milkdrinkers.wordweaver.LocaleUtil.*;
+import static io.github.milkdrinkers.wordweaver.LocaleUtil.fromTag;
+import static io.github.milkdrinkers.wordweaver.LocaleUtil.toTag;
 
 /**
  * Configuration for WordWeaver
  */
 public class TranslationConfig {
-    public static final Locale DEFAULT_LANG = Locale.US;
+    public static final Locale DEFAULT_LOCALE = Locale.US;
 
     // Configuration
     private @KeyPattern.Namespace String namespace;
-    private Path languagesDirectory;
-    private Locale defaultLanguage;
-    private Locale currentLanguage;
+    private Path translationDirectory;
+    private Locale defaultLocale;
+    private Locale currentLocale;
 
     private Path resourcesDirectory;
-    private boolean extractLanguages;
-    private boolean updateLanguages;
+    private boolean extractBundles;
+    private boolean updateBundles;
 
     // Behavior
     private MissingTranslationHandler missingTranslationHandler;
@@ -35,13 +36,13 @@ public class TranslationConfig {
 
     private TranslationConfig() {
         this.namespace = "";
-        this.languagesDirectory = null;
-        this.defaultLanguage = DEFAULT_LANG;
-        this.currentLanguage = defaultLanguage;
+        this.translationDirectory = null;
+        this.defaultLocale = DEFAULT_LOCALE;
+        this.currentLocale = defaultLocale;
 
         this.resourcesDirectory = Paths.get("lang");
-        this.extractLanguages = true;
-        this.updateLanguages = true;
+        this.extractBundles = true;
+        this.updateBundles = true;
 
         this.missingTranslationHandler = MissingTranslationHandler.DEFAULT;
         this.componentConverter = Component::text;
@@ -55,44 +56,44 @@ public class TranslationConfig {
         this.namespace = namespace;
     }
 
-    public Path getLanguagesDirectory() {
-        return languagesDirectory;
+    public Path getTranslationDirectory() {
+        return translationDirectory;
     }
 
-    public String getDefaultLanguage() {
-        return deserialize(defaultLanguage);
+    public String getDefaultLocaleTag() {
+        return toTag(defaultLocale);
     }
 
     public Locale getDefaultLocale() {
-        return defaultLanguage;
+        return defaultLocale;
     }
 
-    public void setDefaultLanguage(Locale defaultLanguage) {
-        this.defaultLanguage = defaultLanguage;
+    public void setDefaultLocale(Locale defaultLocale) {
+        this.defaultLocale = defaultLocale;
     }
 
-    public String getCurrentLanguage() {
-        return deserialize(currentLanguage);
+    public String getCurrentLocaleTag() {
+        return toTag(currentLocale);
     }
 
     public Locale getCurrentLocale() {
-        return currentLanguage;
+        return currentLocale;
     }
 
-    public void setCurrentLanguage(Locale currentLanguage) {
-        this.currentLanguage = currentLanguage;
+    public void setCurrentLocale(Locale currentLocale) {
+        this.currentLocale = currentLocale;
     }
 
     public Path getResourcesDirectory() {
         return resourcesDirectory;
     }
 
-    public boolean shouldExtractLanguages() {
-        return extractLanguages;
+    public boolean shouldExtractBundles() {
+        return extractBundles;
     }
 
-    public boolean shouldUpdateLanguages() {
-        return updateLanguages;
+    public boolean shouldUpdateBundles() {
+        return updateBundles;
     }
 
     public MissingTranslationHandler getMissingTranslationHandler() {
@@ -134,64 +135,64 @@ public class TranslationConfig {
         }
 
         /**
-         * Set the directory where translation files are located.
+         * Set the directory where bundle files are located at runtime.
          *
          * @param directory The directory to use
          */
         public Builder translationDirectory(Path directory) {
-            config.languagesDirectory = directory;
+            config.translationDirectory = directory;
             return this;
         }
 
         /**
-         * Sets the default language to use, this is used as a fallback if a key cannot be found in the requested language.
+         * Sets the default locale to use, this is used as a fallback if a key cannot be found in the requested locale.
          *
-         * @param language The <a href="https://gist.github.com/typpo/b2b828a35e683b9bf8db91b5404f1bd1">BCP 47 Language Code</a> (e.g., "en-US", "xx-XX", "en_US", "xx_XX"), representing a language.
+         * @param localeTag The <a href="https://gist.github.com/typpo/b2b828a35e683b9bf8db91b5404f1bd1">BCP 47 locale tag</a> (e.g., "en-US", "xx-XX", "en_US", "xx_XX"), representing a locale.
          * @implNote Defaults to {@code en_US}
-         * @see #defaultLanguage(Locale)
+         * @see #defaultLocale(Locale)
          */
-        public Builder defaultLanguage(String language) {
-            return defaultLanguage(serialize(language));
+        public Builder defaultLocale(String localeTag) {
+            return defaultLocale(fromTag(localeTag));
         }
 
         /**
-         * Sets the default language to use by specifying a Locale, this is used as a fallback if a key cannot be found in the requested language.
+         * Sets the default locale to use, this is used as a fallback if a key cannot be found in the requested locale.
          *
-         * @param locale A Locale representing a language (e.g., {@code Locale.forLanguageTag("en-US")}, {@code new Locale("en", "US")}, {@code new Locale("xx", "XX")}).
+         * @param locale A Locale representing a locale (e.g., {@code Locale.forLanguageTag("en-US")}, {@code new Locale("en", "US")}, {@code new Locale("xx", "XX")}).
          * @implNote Defaults to {@code Locale.US}
          */
-        public Builder defaultLanguage(Locale locale) {
-            config.defaultLanguage = locale;
+        public Builder defaultLocale(Locale locale) {
+            config.defaultLocale = locale;
             return this;
         }
 
         /**
-         * Sets the language to use
+         * Sets the locale to use
          *
-         * @param language The <a href="https://gist.github.com/typpo/b2b828a35e683b9bf8db91b5404f1bd1">BCP 47 Language Code</a> (e.g., "en-US", "xx-XX", "en_US", "xx_XX"), representing a language.
-         * @implNote Defaults to the value of {@link #defaultLanguage(String)}
-         * @see #language(Locale)
+         * @param localeTag The <a href="https://gist.github.com/typpo/b2b828a35e683b9bf8db91b5404f1bd1">BCP 47 locale tag</a> (e.g., "en-US", "xx-XX", "en_US", "xx_XX"), representing a locale.
+         * @implNote Defaults to the value of {@link #defaultLocale(String)}
+         * @see #locale(Locale)
          */
-        public Builder language(String language) {
-            return language(serialize(language));
+        public Builder locale(String localeTag) {
+            return locale(fromTag(localeTag));
         }
 
         /**
-         * Sets the language to use by specifying a Locale
+         * Sets the locale to use by specifying a Locale
          *
-         * @param locale A Locale representing the language to use (e.g., {@code Locale.forLanguageTag("en-US")}, {@code new Locale("en", "US")}, {@code new Locale("xx", "XX")}).
-         * @implNote Defaults to the value of {@link #defaultLanguage(Locale)}
+         * @param locale A Locale representing the locale to use (e.g., {@code Locale.forLanguageTag("en-US")}, {@code new Locale("en", "US")}, {@code new Locale("xx", "XX")}).
+         * @implNote Defaults to the value of {@link #defaultLocale(Locale)}
          */
-        public Builder language(Locale locale) {
-            config.currentLanguage = locale;
+        public Builder locale(Locale locale) {
+            config.currentLocale = locale;
             return this;
         }
 
         /**
-         * Set the subdirectory where language files are located in the resources directory.
+         * Set the subdirectory where bundle files are located in the resources directory.
          *
-         * @param path Relative path to the subdirectory where language files are located.
-         * @implNote Defaults to {@code lang}. This defines where the language files shipped with your program are located.
+         * @param path Relative path to the subdirectory where bundle files are located.
+         * @implNote Defaults to {@code lang}. This defines where the bundle files shipped with your program are located.
          */
         public Builder resourcesDirectory(Path path) {
             config.resourcesDirectory = path;
@@ -199,24 +200,24 @@ public class TranslationConfig {
         }
 
         /**
-         * Set whether to extract missing language files to the languages directory
+         * Set whether to extract missing bundle files to the translation directory
          *
-         * @param extract Whether to extract missing language files
+         * @param extract Whether to extract missing bundle files
          * @implNote Defaults to true
          */
-        public Builder extractLanguages(boolean extract) {
-            config.extractLanguages = extract;
+        public Builder extractBundles(boolean extract) {
+            config.extractBundles = extract;
             return this;
         }
 
         /**
-         * Set whether to add missing keys to existing language files
+         * Set whether to add missing entries to existing bundle files
          *
-         * @param update Whether to add missing keys to existing language files
+         * @param update Whether to add missing entries to existing bundle files
          * @implNote Defaults to true
          */
-        public Builder updateLanguages(boolean update) {
-            config.updateLanguages = update;
+        public Builder updateBundles(boolean update) {
+            config.updateBundles = update;
             return this;
         }
 
@@ -259,14 +260,14 @@ public class TranslationConfig {
                 throw new IllegalStateException("Namespace is invalid, we recommend \"wordweaver:pluginname\"", e);
             }
 
-            if (config.languagesDirectory == null)
+            if (config.translationDirectory == null)
                 throw new IllegalStateException("Translation directory must be set");
 
-            if (config.defaultLanguage == null)
-                config.defaultLanguage = DEFAULT_LANG;
+            if (config.defaultLocale == null)
+                config.defaultLocale = DEFAULT_LOCALE;
 
-            if (config.currentLanguage == null)
-                config.currentLanguage = config.defaultLanguage;
+            if (config.currentLocale == null)
+                config.currentLocale = config.defaultLocale;
 
             if (config.resourcesDirectory == null)
                 config.resourcesDirectory = Paths.get("lang");

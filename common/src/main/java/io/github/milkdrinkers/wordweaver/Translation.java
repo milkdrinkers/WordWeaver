@@ -5,8 +5,8 @@ import io.github.milkdrinkers.wordweaver.loader.TranslationLoader;
 import io.github.milkdrinkers.wordweaver.loader.impl.JsonTranslationLoader;
 import io.github.milkdrinkers.wordweaver.service.TranslationService;
 import io.github.milkdrinkers.wordweaver.service.impl.TranslationServiceImpl;
-import io.github.milkdrinkers.wordweaver.storage.LanguageRegistry;
-import io.github.milkdrinkers.wordweaver.storage.impl.LanguageRegistryImpl;
+import io.github.milkdrinkers.wordweaver.storage.TranslationBundleRegistry;
+import io.github.milkdrinkers.wordweaver.storage.impl.TranslationBundleRegistryImpl;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,7 +18,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import static io.github.milkdrinkers.wordweaver.LocaleUtil.*;
+import static io.github.milkdrinkers.wordweaver.LocaleUtil.fromTag;
+import static io.github.milkdrinkers.wordweaver.LocaleUtil.toTag;
 
 /**
  * Main API interface for accessing WordWeaver translations.
@@ -35,7 +36,7 @@ public final class Translation {
     }
 
     /**
-     * Get a translation string by key
+     * Get the translated string for a key
      *
      * @param key The key to the translation
      */
@@ -44,7 +45,7 @@ public final class Translation {
     }
 
     /**
-     * Get a translation string by key
+     * Get the translated string for a key
      *
      * @param key      The key to the translation
      * @param fallback The default value to return if no valid value was found
@@ -54,7 +55,7 @@ public final class Translation {
     }
 
     /**
-     * Get a list of translation strings by key
+     * Get the translated list of strings for a key
      *
      * @param key The key to the translation
      * @see #ofList(String)
@@ -64,7 +65,7 @@ public final class Translation {
     }
 
     /**
-     * Get a list of translation strings by key
+     * Get the translated list of strings for a key
      *
      * @param key      The key to the translation
      * @param fallback The default value to return if no valid value was found, empty list if null
@@ -74,7 +75,7 @@ public final class Translation {
     }
 
     /**
-     * Get a translation as an Adventure Component
+     * Get the translated value for a key as an Adventure Component
      *
      * @param key The key to the translation
      * @see Component
@@ -84,7 +85,7 @@ public final class Translation {
     }
 
     /**
-     * Get a translation as an Adventure Component
+     * Get the translated value for a key as an Adventure Component
      *
      * @param key      The key to the translation
      * @param fallback The default value to return if no valid value was found
@@ -95,7 +96,7 @@ public final class Translation {
     }
 
     /**
-     * Get a list of translation Adventure Components by key
+     * Get the translated list of Adventure Components for a key
      *
      * @param key The key to the translation
      * @see #asList(String, List)
@@ -106,7 +107,7 @@ public final class Translation {
     }
 
     /**
-     * Get a list as translation Adventure Components by key
+     * Get the translated list of Adventure Components for a key
      *
      * @param key      The key to the translation
      * @param fallback The default value to return if no valid value was found, empty list if null
@@ -118,73 +119,73 @@ public final class Translation {
     }
 
     /**
-     * Get a list of all translation entries in the current and fallback language
+     * Get a set of all entry keys in the current and fallback bundles
      *
-     * @return A set of all keys in the current and fallback language
+     * @return A set of all keys in the current and fallback bundles
      */
     public static Set<String> getKeys() {
         return TranslationProvider.getInstance().getTranslationService().getKeys();
     }
 
     /**
-     * Set the default/fallback language
+     * Set the default/fallback locale
      *
-     * @param language The <a href="https://gist.github.com/typpo/b2b828a35e683b9bf8db91b5404f1bd1">BCP 47 Language Code</a> (e.g., "en-US", "xx-XX", "en_US", "xx_XX"), representing a language.
+     * @param localeTag The <a href="https://gist.github.com/typpo/b2b828a35e683b9bf8db91b5404f1bd1">BCP 47 locale tag</a> (e.g., "en-US", "xx-XX", "en_US", "xx_XX"), representing a locale.
      */
-    public static void setDefaultLanguage(@NotNull String language) {
-        setDefaultLanguage(serialize(language));
+    public static void setDefaultLocale(@NotNull String localeTag) {
+        setDefaultLocale(fromTag(localeTag));
     }
 
     /**
-     * Set the default/fallback language
+     * Set the default/fallback locale
      *
-     * @param locale A Locale representing a language (e.g., {@code Locale.forLanguageTag("en-US")}, {@code new Locale("en", "US")}, {@code new Locale("xx", "XX")}).
+     * @param locale A Locale representing a locale (e.g., {@code Locale.forLanguageTag("en-US")}, {@code new Locale("en", "US")}, {@code new Locale("xx", "XX")}).
      */
-    public static void setDefaultLanguage(@NotNull Locale locale) {
+    public static void setDefaultLocale(@NotNull Locale locale) {
         TranslationProvider.getInstance().getTranslationService().setDefaultLocale(locale);
     }
 
     /**
-     * Get the default/fallback language
+     * Get the default/fallback locale as a locale tag
      */
-    public static String getDefaultLanguage() {
-        return deserialize(getDefaultLocale());
+    public static String getDefaultLocaleTag() {
+        return toTag(getDefaultLocale());
     }
 
     /**
-     * Get the default/fallback language
+     * Get the default/fallback locale
      */
     public static Locale getDefaultLocale() {
         return TranslationProvider.getInstance().getTranslationService().getDefaultLocale();
     }
 
     /**
-     * Set the active language
+     * Set the active locale
      *
-     * @param language The <a href="https://gist.github.com/typpo/b2b828a35e683b9bf8db91b5404f1bd1">BCP 47 Language Code</a> (e.g., "en-US", "xx-XX", "en_US", "xx_XX"), representing a language.
+     * @param localeTag The <a href="https://gist.github.com/typpo/b2b828a35e683b9bf8db91b5404f1bd1">BCP 47 locale tag</a> (e.g., "en-US", "xx-XX", "en_US", "xx_XX"), representing a locale.
      */
-    public static void setLanguage(@NotNull String language) {
-        setLanguage(serialize(language));
+    public static void setLocale(@NotNull String localeTag) {
+        setLocale(fromTag(localeTag));
     }
 
     /**
-     * Set the active language
+     * Set the active locale
      *
-     * @param locale A Locale representing the language to use (e.g., {@code Locale.forLanguageTag("en-US")}, {@code new Locale("en", "US")}, {@code new Locale("xx", "XX")}).
+     * @param locale A Locale representing the locale to use (e.g., {@code Locale.forLanguageTag("en-US")}, {@code new Locale("en", "US")}, {@code new Locale("xx", "XX")}).
      */
-    public static void setLanguage(@NotNull Locale locale) {
+    public static void setLocale(@NotNull Locale locale) {
         TranslationProvider.getInstance().getTranslationService().setLocale(locale);
     }
 
     /**
-     * Get the active language
+     * Get the active locale as a locale tag
      */
-    public static String getLanguage() {
-        return deserialize(getLocale());
+    public static String getLocaleTag() {
+        return toTag(getLocale());
     }
 
     /**
-     * Get the active language
+     * Get the active locale
      */
     public static Locale getLocale() {
         return TranslationProvider.getInstance().getTranslationService().getLocale();
@@ -197,14 +198,14 @@ public final class Translation {
      */
     @SuppressWarnings("unused")
     public static void initialize(@NotNull TranslationConfig config) {
-        final LanguageRegistry registry = new LanguageRegistryImpl(config);
+        final TranslationBundleRegistry registry = new TranslationBundleRegistryImpl(config);
         final TranslationLoader loader = new JsonTranslationLoader(config, registry);
         final TranslationService service = new TranslationServiceImpl(config, registry, loader);
 
         // Initialize provider
         TranslationProvider.initialize(service);
 
-        LOGGER.debug("Initialized WordWeaver with current language: {}, and fallback language: {}", config.getCurrentLanguage(), config.getDefaultLanguage());
+        LOGGER.debug("Initialized WordWeaver with current locale: {}, and fallback locale: {}", config.getCurrentLocaleTag(), config.getDefaultLocaleTag());
     }
 
     /**

@@ -43,8 +43,8 @@
 - **Adventure 4+ Support** - Native integration for modern text components
 - **Java 8+ Compatibility** - Supports legacy and modern java versions
 - **Tested** - Comprehensive unit test coverage
-- **JSON** - Easy to edit language files using Json with comments
-- **Advanced Features** - Comes with optional advanced features like language file extractor and updater
+- **JSON** - Easy to edit translation files using Json with comments
+- **Advanced Features** - Comes with optional advanced features like translation file extractor and updater
 
 ## 📦 Installation
 
@@ -90,9 +90,10 @@ import io.github.milkdrinkers.wordweaver.config.TranslationConfig;
 
 // Create configuration
 TranslationConfig config = TranslationConfig.builder()
-    .translationDirectory(Paths.of("lang")) // The directory lang files will be stored in
-    .language("fr_FR") // The primary language used
-    .defaultLanguage("en_US") // The fallback language
+    .namespace("wordweaver:example") // The namespace of your plugin/mod (required)
+    .translationDirectory(Paths.get("lang")) // The directory bundle files will be stored in
+    .locale("fr_FR") // The active locale
+    .defaultLocale("en_US") // The fallback locale
     .build();
     
 // Initialize WordWeaver

@@ -4,9 +4,9 @@ import io.github.milkdrinkers.wordweaver.TranslatorImpl;
 import io.github.milkdrinkers.wordweaver.config.TranslationConfig;
 import io.github.milkdrinkers.wordweaver.loader.TranslationLoader;
 import io.github.milkdrinkers.wordweaver.service.TranslationService;
-import io.github.milkdrinkers.wordweaver.storage.Language;
-import io.github.milkdrinkers.wordweaver.storage.LanguageEntry;
-import io.github.milkdrinkers.wordweaver.storage.LanguageRegistry;
+import io.github.milkdrinkers.wordweaver.storage.TranslationBundle;
+import io.github.milkdrinkers.wordweaver.storage.TranslationBundleEntry;
+import io.github.milkdrinkers.wordweaver.storage.TranslationBundleRegistry;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.translation.GlobalTranslator;
 import net.kyori.adventure.translation.Translator;
@@ -22,16 +22,16 @@ import java.util.stream.Collectors;
 public class TranslationServiceImpl implements TranslationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(TranslationServiceImpl.class);
     private final TranslationConfig config;
-    private final LanguageRegistry registry;
+    private final TranslationBundleRegistry registry;
     private final TranslationLoader loader;
     private Translator translator;
 
-    public TranslationServiceImpl(TranslationConfig config, LanguageRegistry registry, TranslationLoader loader) {
+    public TranslationServiceImpl(TranslationConfig config, TranslationBundleRegistry registry, TranslationLoader loader) {
         this.config = config;
         this.registry = registry;
         this.loader = loader;
 
-        // Initialize translations
+        // Initialize bundles
         initialize();
 
         translator = new TranslatorImpl(config);
@@ -40,12 +40,12 @@ public class TranslationServiceImpl implements TranslationService {
 
     private void initialize() {
         try {
-            // Extract, update and load translations
-            if (config.shouldExtractLanguages())
-                loader.extractMissingLanguages();
-            if (config.shouldUpdateLanguages())
-                loader.updateExistingLanguages();
-            loader.loadLanguages();
+            // Extract, update and load bundles
+            if (config.shouldExtractBundles())
+                loader.extractMissingBundles();
+            if (config.shouldUpdateBundles())
+                loader.updateExistingBundles();
+            loader.loadBundles();
         } catch (Exception e) {
             LOGGER.error("Failed to initialize translation service", e);
         }
@@ -53,11 +53,11 @@ public class TranslationServiceImpl implements TranslationService {
 
     @Override
     public String getString(Locale locale, String key, @Nullable String fallback) {
-        final Language language = registry.get(locale);
-        if (language == null)
+        final TranslationBundle bundle = registry.get(locale);
+        if (bundle == null)
             return config.getMissingTranslationHandler().handle(config, registry, key, fallback);
 
-        final LanguageEntry value = language.get(key);
+        final TranslationBundleEntry value = bundle.getEntry(key);
         if (value == null)
             return config.getMissingTranslationHandler().handle(config, registry, key, fallback);
 
@@ -66,11 +66,11 @@ public class TranslationServiceImpl implements TranslationService {
 
     @Override
     public List<String> getStringList(Locale locale, String key, List<String> fallback) {
-        final Language language = registry.get(locale);
-        if (language == null)
+        final TranslationBundle bundle = registry.get(locale);
+        if (bundle == null)
             return config.getMissingTranslationHandler().handleListString(config, registry, key, fallback);
 
-        final LanguageEntry value = language.get(key);
+        final TranslationBundleEntry value = bundle.getEntry(key);
         if (value == null)
             return config.getMissingTranslationHandler().handleListString(config, registry, key, fallback);
 
@@ -79,11 +79,11 @@ public class TranslationServiceImpl implements TranslationService {
 
     @Override
     public Component getComponent(Locale locale, String key, Component fallback) {
-        final Language language = registry.get(locale);
-        if (language == null)
+        final TranslationBundle bundle = registry.get(locale);
+        if (bundle == null)
             return config.getMissingTranslationHandler().handle(config, registry, key, (Component) null);
 
-        final LanguageEntry value = language.get(key);
+        final TranslationBundleEntry value = bundle.getEntry(key);
         if (value == null)
             return config.getMissingTranslationHandler().handle(config, registry, key, (Component) null);
 
@@ -92,11 +92,11 @@ public class TranslationServiceImpl implements TranslationService {
 
     @Override
     public List<Component> getComponentList(Locale locale, String key, List<Component> fallback) {
-        final Language language = registry.get(locale);
-        if (language == null)
+        final TranslationBundle bundle = registry.get(locale);
+        if (bundle == null)
             return config.getMissingTranslationHandler().handleListComponent(config, registry, key, null);
 
-        final LanguageEntry value = language.get(key);
+        final TranslationBundleEntry value = bundle.getEntry(key);
         if (value == null)
             return config.getMissingTranslationHandler().handleListComponent(config, registry, key, null);
 
@@ -111,8 +111,8 @@ public class TranslationServiceImpl implements TranslationService {
     }
 
     @Override
-    public void setDefaultLocale(Locale language) {
-        config.setDefaultLanguage(language);
+    public void setDefaultLocale(Locale locale) {
+        config.setDefaultLocale(locale);
     }
 
     @Override
@@ -121,8 +121,8 @@ public class TranslationServiceImpl implements TranslationService {
     }
 
     @Override
-    public void setLocale(Locale language) {
-        config.setCurrentLanguage(language);
+    public void setLocale(Locale locale) {
+        config.setCurrentLocale(locale);
     }
 
     @Override
@@ -135,7 +135,7 @@ public class TranslationServiceImpl implements TranslationService {
         try {
             GlobalTranslator.translator().removeSource(translator);
             registry.clear();
-            loader.loadLanguages();
+            loader.loadBundles();
             translator = new TranslatorImpl(config);
             GlobalTranslator.translator().addSource(translator);
         } catch (Exception e) {

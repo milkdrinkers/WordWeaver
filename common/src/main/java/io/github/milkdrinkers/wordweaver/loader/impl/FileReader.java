@@ -2,9 +2,9 @@ package io.github.milkdrinkers.wordweaver.loader.impl;
 
 import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
-import io.github.milkdrinkers.wordweaver.storage.LanguageEntry;
-import io.github.milkdrinkers.wordweaver.storage.LanguageLoadException;
-import io.github.milkdrinkers.wordweaver.storage.impl.LanguageEntryImpl;
+import io.github.milkdrinkers.wordweaver.storage.TranslationBundleEntry;
+import io.github.milkdrinkers.wordweaver.storage.TranslationLoadException;
+import io.github.milkdrinkers.wordweaver.storage.impl.TranslationBundleEntryImpl;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -29,9 +29,9 @@ final class FileReader {
      *
      * @param path The path to the file
      * @return A map of translations
-     * @throws LanguageLoadException If the file does not exist, can not be read, is not a file, or the json is malformed
+     * @throws TranslationLoadException If the file does not exist, can not be read, is not a file, or the json is malformed
      */
-    public static Map<String, LanguageEntry> readFile(final String path) throws LanguageLoadException {
+    public static Map<String, TranslationBundleEntry> readFile(final String path) throws TranslationLoadException {
         return readFile(new File(path));
     }
 
@@ -40,9 +40,9 @@ final class FileReader {
      *
      * @param path The path to the file
      * @return A map of translations
-     * @throws LanguageLoadException If the file does not exist, can not be read, is not a file, or the json is malformed
+     * @throws TranslationLoadException If the file does not exist, can not be read, is not a file, or the json is malformed
      */
-    public static Map<String, LanguageEntry> readFile(final Path path) throws LanguageLoadException {
+    public static Map<String, TranslationBundleEntry> readFile(final Path path) throws TranslationLoadException {
         return readFile(path.toFile());
     }
 
@@ -51,20 +51,20 @@ final class FileReader {
      *
      * @param file The file to read
      * @return A map of translations
-     * @throws LanguageLoadException If the file does not exist, can not be read, is not a file, or the json is malformed
+     * @throws TranslationLoadException If the file does not exist, can not be read, is not a file, or the json is malformed
      */
-    public static Map<String, LanguageEntry> readFile(final File file) throws LanguageLoadException {
+    public static Map<String, TranslationBundleEntry> readFile(final File file) throws TranslationLoadException {
         try {
             if (!file.exists())
-                throw new LanguageLoadException("The language file does not exist!");
+                throw new TranslationLoadException("The language file does not exist!");
 
             if (!file.canRead())
-                throw new LanguageLoadException("The language file can not be read! Ensure the application has sufficient permissions to read the file.");
+                throw new TranslationLoadException("The language file can not be read! Ensure the application has sufficient permissions to read the file.");
 
             if (!file.isFile())
-                throw new LanguageLoadException("The language file is not a file!");
+                throw new TranslationLoadException("The language file is not a file!");
         } catch (SecurityException e) {
-            throw new LanguageLoadException("Security violation!", e);
+            throw new TranslationLoadException("Security violation!", e);
         }
 
         try (
@@ -75,15 +75,15 @@ final class FileReader {
             final JsonObject jsonObject = JsonParser.parseReader(jsonReader).getAsJsonObject();
 
             if (jsonObject == null)
-                throw new LanguageLoadException("Failed to read json as it is malformed!");
+                throw new TranslationLoadException("Failed to read json as it is malformed!");
 
             return Parser.processAllEntries(flatten(jsonObject));
         } catch (JsonIOException e) {
-            throw new LanguageLoadException("Failed to read json from reader!", e);
+            throw new TranslationLoadException("Failed to read json from reader!", e);
         } catch (JsonSyntaxException e) {
-            throw new LanguageLoadException("Failed to read json as it is malformed!", e);
+            throw new TranslationLoadException("Failed to read json as it is malformed!", e);
         } catch (IOException e) {
-            throw new LanguageLoadException("Failed to read json as the file does not exist!", e);
+            throw new TranslationLoadException("Failed to read json as the file does not exist!", e);
         }
     }
 
@@ -93,8 +93,8 @@ final class FileReader {
      * @param jsonObject The JsonObject to flatten
      * @return A map of translations
      */
-    public static Map<String, LanguageEntry> flatten(final JsonObject jsonObject) {
-        final Map<String, LanguageEntry> translationMap = new HashMap<>();
+    public static Map<String, TranslationBundleEntry> flatten(final JsonObject jsonObject) {
+        final Map<String, TranslationBundleEntry> translationMap = new HashMap<>();
 
         if (jsonObject.isJsonNull()) {
             return translationMap;
@@ -112,18 +112,18 @@ final class FileReader {
      * @param element        The current JsonElement
      * @param translationMap The map that stores the translations
      */
-    private static void flattenJsonElement(final String currentPath, final JsonElement element, final Map<String, LanguageEntry> translationMap) {
+    private static void flattenJsonElement(final String currentPath, final JsonElement element, final Map<String, TranslationBundleEntry> translationMap) {
         if (element.isJsonPrimitive()) {
             final JsonPrimitive jsonPrimitive = element.getAsJsonPrimitive();
 
-            translationMap.put(currentPath, new LanguageEntryImpl(LanguageEntry.Type.STRING, jsonPrimitive.getAsString()));
+            translationMap.put(currentPath, new TranslationBundleEntryImpl(TranslationBundleEntry.Type.STRING, jsonPrimitive.getAsString()));
         } else if (element.isJsonObject()) {
             flattenObject(currentPath, element, translationMap);
         } else if (element.isJsonArray()) {
             flattenArray(currentPath, element, translationMap);
         } else if (element.isJsonNull()) {
             // Add empty translation for null
-            translationMap.put(currentPath, new LanguageEntryImpl(LanguageEntry.Type.STRING, ""));
+            translationMap.put(currentPath, new TranslationBundleEntryImpl(TranslationBundleEntry.Type.STRING, ""));
         }
     }
 
@@ -134,7 +134,7 @@ final class FileReader {
      * @param element        The current JsonElement
      * @param translationMap The map that stores the translations
      */
-    private static void flattenObject(final String currentPath, final JsonElement element, final Map<String, LanguageEntry> translationMap) {
+    private static void flattenObject(final String currentPath, final JsonElement element, final Map<String, TranslationBundleEntry> translationMap) {
         /*
             Allows accessing individual elements via {@code object.key}.
          */
@@ -156,7 +156,7 @@ final class FileReader {
      * @param translationMap The map that stores the translations
      * @implNote This method stores individual elements with array indices and the complete array as a Translation with all values
      */
-    private static void flattenArray(final String currentPath, final JsonElement element, final Map<String, LanguageEntry> translationMap) {
+    private static void flattenArray(final String currentPath, final JsonElement element, final Map<String, TranslationBundleEntry> translationMap) {
         /*
           Allows accessing individual elements via {@code array[index]}.
           Allows retrieving the entire array of elements via {@code array}.
@@ -176,7 +176,7 @@ final class FileReader {
                 arrayValues.add(arrayValue);
 
                 // Add unique entry for element
-                translationMap.put(internalPath, new LanguageEntryImpl(LanguageEntry.Type.LIST, arrayValue));
+                translationMap.put(internalPath, new TranslationBundleEntryImpl(TranslationBundleEntry.Type.LIST, arrayValue));
             } else {
                 // Recursively flatten
                 flattenJsonElement(internalPath, arrayElement, translationMap);
@@ -185,7 +185,7 @@ final class FileReader {
 
         // Store the complete array as a Translation with all values
         if (!arrayValues.isEmpty()) {
-            translationMap.put(currentPath, new LanguageEntryImpl(LanguageEntry.Type.LIST, arrayValues));
+            translationMap.put(currentPath, new TranslationBundleEntryImpl(TranslationBundleEntry.Type.LIST, arrayValues));
         }
     }
 
@@ -199,8 +199,8 @@ final class FileReader {
          * @param entries The original map of language entries
          * @return A new map with resolved references
          */
-        public static Map<String, LanguageEntry> processAllEntries(final Map<String, LanguageEntry> entries) {
-            final Map<String, LanguageEntry> processed = new HashMap<>(entries);
+        public static Map<String, TranslationBundleEntry> processAllEntries(final Map<String, TranslationBundleEntry> entries) {
+            final Map<String, TranslationBundleEntry> processed = new HashMap<>(entries);
 
             // Process each entry to resolve references
             for (String key : entries.keySet()) {
@@ -218,11 +218,11 @@ final class FileReader {
          * @param results  The map of processed entries
          * @param depth    Current recursion depth
          */
-        private static void processEntry(final String key, final Map<String, LanguageEntry> original, final Map<String, LanguageEntry> results, int depth) {
+        private static void processEntry(final String key, final Map<String, TranslationBundleEntry> original, final Map<String, TranslationBundleEntry> results, int depth) {
             if (depth >= MAX_RECURSION_DEPTH)
                 return;
 
-            final LanguageEntry entry = results.get(key);
+            final TranslationBundleEntry entry = results.get(key);
             if (entry == null)
                 return;
 
@@ -238,14 +238,14 @@ final class FileReader {
                 }
 
                 if (foundAnyKey) {
-                    results.put(key, new LanguageEntryImpl(LanguageEntry.Type.LIST, processedValues));
+                    results.put(key, new TranslationBundleEntryImpl(TranslationBundleEntry.Type.LIST, processedValues));
                 }
             } else { // Handle STRING type entries
                 final StringBuffer processedValue = new StringBuffer();
                 foundAnyKey = replaceKeysInString(entry.getValue(), processedValue, original, results, depth + 1);
 
                 if (foundAnyKey) {
-                    results.put(key, new LanguageEntryImpl(LanguageEntry.Type.STRING, processedValue.toString()));
+                    results.put(key, new TranslationBundleEntryImpl(TranslationBundleEntry.Type.STRING, processedValue.toString()));
                 }
             }
 
@@ -265,7 +265,7 @@ final class FileReader {
          * @param depth    Current recursion depth
          * @return True if any keys were found and replaced
          */
-        private static boolean replaceKeysInString(final String input, final StringBuffer result, final Map<String, LanguageEntry> original, final Map<String, LanguageEntry> results, int depth) {
+        private static boolean replaceKeysInString(final String input, final StringBuffer result, final Map<String, TranslationBundleEntry> original, final Map<String, TranslationBundleEntry> results, int depth) {
             boolean foundAnyKey = false;
             final Matcher matcher = KEY_PATTERN.matcher(input);
 
@@ -292,7 +292,7 @@ final class FileReader {
          * @param depth     Current recursion depth
          * @return The replacement value or the original match if not found
          */
-        private static String getReplacementValue(final String keyName, final String fullMatch, final Map<String, LanguageEntry> original, final Map<String, LanguageEntry> results, int depth) {
+        private static String getReplacementValue(final String keyName, final String fullMatch, final Map<String, TranslationBundleEntry> original, final Map<String, TranslationBundleEntry> results, int depth) {
             if (original.containsKey(keyName)) { // If the referenced key exists, ensure it's processed
                 processEntry(keyName, original, results, depth + 1);
 

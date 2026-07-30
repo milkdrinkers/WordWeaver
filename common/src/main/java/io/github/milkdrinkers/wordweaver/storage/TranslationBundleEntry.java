@@ -3,14 +3,14 @@ package io.github.milkdrinkers.wordweaver.storage;
 import java.util.List;
 
 /**
- * Represents an entry in a language.
+ * Represents an entry inside a bundle.
  * <p>
- * This interface is used to represent a single translation entry in a language. It is used to
+ * This interface is used to represent a single translation entry within a {@link TranslationBundle}. It is used to
  * provide a common interface for all entries, regardless of their native json type.
  *
- * @see Language
+ * @see TranslationBundle
  */
-public interface LanguageEntry {
+public interface TranslationBundleEntry {
     enum Type {
         STRING,
         LIST

@@ -1,17 +1,17 @@
 package io.github.milkdrinkers.wordweaver.storage.impl;
 
-import io.github.milkdrinkers.wordweaver.storage.LanguageEntry;
+import io.github.milkdrinkers.wordweaver.storage.TranslationBundleEntry;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class LanguageEntryImpl implements LanguageEntry {
+public class TranslationBundleEntryImpl implements TranslationBundleEntry {
     private final Type type;
     private final String value;
     private final List<String> values;
 
-    public LanguageEntryImpl(final Type type, final String value) {
+    public TranslationBundleEntryImpl(final Type type, final String value) {
         this.type = type;
         this.value = value;
 
@@ -19,7 +19,7 @@ public class LanguageEntryImpl implements LanguageEntry {
         this.values = new ArrayList<>(Collections.singletonList(value));
     }
 
-    public LanguageEntryImpl(final Type type, final List<String> values) {
+    public TranslationBundleEntryImpl(final Type type, final List<String> values) {
         this.type = type;
 
         // Compute a compatibility value for getValue()
