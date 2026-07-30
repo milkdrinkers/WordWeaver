@@ -1,5 +1,6 @@
 package io.github.milkdrinkers.wordweaver.service.impl;
 
+import io.github.milkdrinkers.wordweaver.TranslatorImpl;
 import io.github.milkdrinkers.wordweaver.config.TranslationConfig;
 import io.github.milkdrinkers.wordweaver.loader.TranslationLoader;
 import io.github.milkdrinkers.wordweaver.service.TranslationService;
@@ -7,6 +8,8 @@ import io.github.milkdrinkers.wordweaver.storage.Language;
 import io.github.milkdrinkers.wordweaver.storage.LanguageEntry;
 import io.github.milkdrinkers.wordweaver.storage.LanguageRegistry;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.translation.GlobalTranslator;
+import net.kyori.adventure.translation.Translator;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +24,7 @@ public class TranslationServiceImpl implements TranslationService {
     private final TranslationConfig config;
     private final LanguageRegistry registry;
     private final TranslationLoader loader;
+    private Translator translator;
 
     public TranslationServiceImpl(TranslationConfig config, LanguageRegistry registry, TranslationLoader loader) {
         this.config = config;
@@ -29,6 +33,9 @@ public class TranslationServiceImpl implements TranslationService {
 
         // Initialize translations
         initialize();
+
+        translator = new TranslatorImpl(config);
+        GlobalTranslator.translator().addSource(translator);
     }
 
     private void initialize() {
@@ -126,8 +133,11 @@ public class TranslationServiceImpl implements TranslationService {
     @Override
     public void reload() {
         try {
+            GlobalTranslator.translator().removeSource(translator);
             registry.clear();
             loader.loadLanguages();
+            translator = new TranslatorImpl(config);
+            GlobalTranslator.translator().addSource(translator);
         } catch (Exception e) {
             LOGGER.error("Failed to reload translation service", e);
         }

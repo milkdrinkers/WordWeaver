@@ -1,6 +1,9 @@
 package io.github.milkdrinkers.wordweaver.config;
 
 import io.github.milkdrinkers.wordweaver.MissingTranslationHandler;
+import net.kyori.adventure.key.InvalidKeyException;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.key.KeyPattern;
 import net.kyori.adventure.text.Component;
 
 import java.nio.file.Path;
@@ -17,6 +20,7 @@ public class TranslationConfig {
     public static final Locale DEFAULT_LANG = Locale.US;
 
     // Configuration
+    private @KeyPattern.Namespace String namespace;
     private Path languagesDirectory;
     private Locale defaultLanguage;
     private Locale currentLanguage;
@@ -30,6 +34,7 @@ public class TranslationConfig {
     private Function<String, Component> componentConverter;
 
     private TranslationConfig() {
+        this.namespace = "";
         this.languagesDirectory = null;
         this.defaultLanguage = DEFAULT_LANG;
         this.currentLanguage = defaultLanguage;
@@ -40,6 +45,14 @@ public class TranslationConfig {
 
         this.missingTranslationHandler = MissingTranslationHandler.DEFAULT;
         this.componentConverter = Component::text;
+    }
+
+    public @KeyPattern.Namespace String getNamespace() {
+        return namespace;
+    }
+
+    public void setNamespace(@KeyPattern.Namespace String namespace) {
+        this.namespace = namespace;
     }
 
     public Path getLanguagesDirectory() {
@@ -106,6 +119,17 @@ public class TranslationConfig {
         private final TranslationConfig config = new TranslationConfig();
 
         private Builder() {
+        }
+
+        /**
+         * Set the namespace of the implementing plugin/mod.
+         * This is used to access translations through the {@link net.kyori.adventure.translation.GlobalTranslator}.
+         *
+         * @param namespace The namespace to use
+         */
+        public Builder namespace(@KeyPattern.Namespace String namespace) {
+            config.namespace = namespace;
+            return this;
         }
 
         /**
@@ -224,6 +248,16 @@ public class TranslationConfig {
          * @return The configured TranslationConfig
          */
         public TranslationConfig build() {
+            if (config.namespace == null || config.namespace.isEmpty())
+                throw new IllegalStateException("Namespace must be set");
+
+            try {
+                // noinspection PatternValidation
+                Key.key(config.getNamespace());
+            } catch (InvalidKeyException e) {
+                throw new IllegalStateException("Namespace is invalid, we recommend \"wordweaver:pluginname\"", e);
+            }
+
             if (config.languagesDirectory == null)
                 throw new IllegalStateException("Translation directory must be set");
 
