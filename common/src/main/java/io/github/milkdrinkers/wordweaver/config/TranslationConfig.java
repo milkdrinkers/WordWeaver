@@ -108,6 +108,7 @@ public class TranslationConfig {
      *
      * @return A new builder instance
      */
+    @SuppressWarnings("unused")
     public static Builder builder() {
         return new Builder();
     }

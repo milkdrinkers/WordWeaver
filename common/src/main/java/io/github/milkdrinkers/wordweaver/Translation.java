@@ -195,6 +195,7 @@ public final class Translation {
      *
      * @implSpec This method will initialize the translation system with the provided configuration. WordWeaver will throw exceptions if it has not been initialized before usage.
      */
+    @SuppressWarnings("unused")
     public static void initialize(@NotNull TranslationConfig config) {
         final LanguageRegistry registry = new LanguageRegistryImpl(config);
         final TranslationLoader loader = new JsonTranslationLoader(config, registry);
@@ -209,6 +210,7 @@ public final class Translation {
     /**
      * Reload all translations
      */
+    @SuppressWarnings("unused")
     public static void reload() {
         TranslationProvider.getInstance().getTranslationService().reload();
     }
