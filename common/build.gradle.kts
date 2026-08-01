@@ -9,9 +9,11 @@ plugins {
 
 dependencies {
     implementation(libs.slf4j.api)
-    compileOnlyApi(libs.adventure)
+    compileOnlyApi(libs.adventure.api)
+    compileOnlyApi(libs.adventure.minimessage)
 
-    testImplementation(libs.adventure)
+    testImplementation(libs.adventure.api)
+    testImplementation(libs.adventure.minimessage)
     testImplementation(libs.slf4j.simple)
 }
 

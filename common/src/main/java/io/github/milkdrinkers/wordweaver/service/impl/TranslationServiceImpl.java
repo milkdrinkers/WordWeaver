@@ -1,6 +1,5 @@
 package io.github.milkdrinkers.wordweaver.service.impl;
 
-import io.github.milkdrinkers.wordweaver.TranslatorImpl;
 import io.github.milkdrinkers.wordweaver.config.TranslationConfig;
 import io.github.milkdrinkers.wordweaver.loader.TranslationLoader;
 import io.github.milkdrinkers.wordweaver.service.TranslationService;
@@ -8,8 +7,6 @@ import io.github.milkdrinkers.wordweaver.storage.TranslationBundle;
 import io.github.milkdrinkers.wordweaver.storage.TranslationBundleEntry;
 import io.github.milkdrinkers.wordweaver.storage.TranslationBundleRegistry;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.translation.GlobalTranslator;
-import net.kyori.adventure.translation.Translator;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,18 +21,17 @@ public class TranslationServiceImpl implements TranslationService {
     private final TranslationConfig config;
     private final TranslationBundleRegistry registry;
     private final TranslationLoader loader;
-    private Translator translator;
+    private final GlobalTranslatorBridge bridge;
 
     public TranslationServiceImpl(TranslationConfig config, TranslationBundleRegistry registry, TranslationLoader loader) {
         this.config = config;
         this.registry = registry;
         this.loader = loader;
 
-        // Initialize bundles
         initialize();
 
-        translator = new TranslatorImpl(config);
-        GlobalTranslator.translator().addSource(translator);
+        bridge = new GlobalTranslatorBridge(config, registry);
+        bridge.register();
     }
 
     private void initialize() {
@@ -133,11 +129,8 @@ public class TranslationServiceImpl implements TranslationService {
     @Override
     public void reload() {
         try {
-            GlobalTranslator.translator().removeSource(translator);
             registry.clear();
             loader.loadBundles();
-            translator = new TranslatorImpl(config);
-            GlobalTranslator.translator().addSource(translator);
         } catch (Exception e) {
             LOGGER.error("Failed to reload translation service", e);
         }

@@ -10,7 +10,8 @@ dependencies {
     api(projects.common)
     compileOnly(libs.gson)
 
-    testImplementation(libs.adventure)
+    testImplementation(libs.adventure.api)
+    testImplementation(libs.adventure.minimessage)
     testImplementation(libs.gson)
     testImplementation(libs.slf4j.simple)
 }

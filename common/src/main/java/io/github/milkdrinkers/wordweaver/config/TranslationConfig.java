@@ -6,6 +6,7 @@ import net.kyori.adventure.key.InvalidKeyException;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.KeyPattern;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -36,6 +37,7 @@ public class TranslationConfig {
     // Behavior
     private MissingTranslationHandler missingTranslationHandler;
     private Function<String, Component> componentConverter;
+    private MiniMessage miniMessage;
     private final List<TranslationParser> parsers = new ArrayList<>();
 
     private TranslationConfig() {
@@ -50,6 +52,7 @@ public class TranslationConfig {
 
         this.missingTranslationHandler = MissingTranslationHandler.DEFAULT;
         this.componentConverter = Component::text;
+        this.miniMessage = MiniMessage.miniMessage();
     }
 
     public @KeyPattern.Namespace String getNamespace() {
@@ -106,6 +109,10 @@ public class TranslationConfig {
 
     public Function<String, Component> getComponentConverter() {
         return componentConverter;
+    }
+
+    public MiniMessage getMiniMessage() {
+        return miniMessage;
     }
 
     public List<TranslationParser> getParsers() {
@@ -253,6 +260,17 @@ public class TranslationConfig {
         }
 
         /**
+         * Set the MiniMessage instance used to render translatable components through the {@link net.kyori.adventure.translation.GlobalTranslator}.
+         *
+         * @param miniMessage The MiniMessage instance to use, e.g. one with custom tag resolvers
+         * @implNote Defaults to {@link MiniMessage#miniMessage()}
+         */
+        public Builder miniMessage(MiniMessage miniMessage) {
+            config.miniMessage = miniMessage;
+            return this;
+        }
+
+        /**
          * Add a parser explicitly, in addition to any auto discovered through the {@link java.util.ServiceLoader}.
          *
          * @param parser The parser to add
@@ -300,6 +318,9 @@ public class TranslationConfig {
 
             if (config.componentConverter == null)
                 config.componentConverter = Component::text;
+
+            if (config.miniMessage == null)
+                config.miniMessage = MiniMessage.miniMessage();
 
             return config;
         }

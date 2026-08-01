@@ -180,7 +180,7 @@ tasks.shadowJar {
 
 </details>
 
-## Simple Usage Example 🚀
+## Usage Example
 
 ```java
 import io.github.milkdrinkers.wordweaver.Translation;
@@ -221,6 +221,34 @@ Example `en_US.json`:
     ]
   }
 }
+```
+
+### Translatable Components
+
+WordWeaver registers with Adventure's [`GlobalTranslator`](https://docs.advntr.dev/localization.html), so your translations are also available as **translatable components**, rendered in each viewer's own locale. This allows your translations to have indexed (`<arg:0>`) and named (`<name>`) arguments.
+
+Example `en_US.json`:
+
+```json
+{
+  "messages": {
+    "welcome": "<gradient:green:aqua>Welcome, <arg:0>!</gradient>",
+    "joined": "<gray><player> joined the game</gray>"
+  }
+}
+```
+
+Reference keys directly:
+
+```java
+// Indexed argument -> <arg:0>
+audience.sendMessage(Component.translatable("messages.welcome", Component.text(name)));
+
+// Named argument -> <player> (net.kyori.adventure.text.minimessage.translation.Argument)
+audience.sendMessage(Component.translatable("messages.joined", Argument.component("player", Component.text(name))));
+
+// Or directly from any MiniMessage string via the <lang> tag
+audience.sendMessage(MiniMessage.miniMessage().deserialize("<gray>[Server]</gray> <lang:messages.welcome:'" + name + "'>"));
 ```
 
 ## 📚 Documentation
