@@ -15,4 +15,6 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 include(
     "common",
+    "parsers:json",
+    "parsers:json-shaded",
 )

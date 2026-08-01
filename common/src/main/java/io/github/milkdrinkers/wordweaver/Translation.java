@@ -2,7 +2,7 @@ package io.github.milkdrinkers.wordweaver;
 
 import io.github.milkdrinkers.wordweaver.config.TranslationConfig;
 import io.github.milkdrinkers.wordweaver.loader.TranslationLoader;
-import io.github.milkdrinkers.wordweaver.loader.impl.JsonTranslationLoader;
+import io.github.milkdrinkers.wordweaver.loader.impl.DefaultTranslationLoader;
 import io.github.milkdrinkers.wordweaver.service.TranslationService;
 import io.github.milkdrinkers.wordweaver.service.impl.TranslationServiceImpl;
 import io.github.milkdrinkers.wordweaver.storage.TranslationBundleRegistry;
@@ -199,7 +199,7 @@ public final class Translation {
     @SuppressWarnings("unused")
     public static void initialize(@NotNull TranslationConfig config) {
         final TranslationBundleRegistry registry = new TranslationBundleRegistryImpl(config);
-        final TranslationLoader loader = new JsonTranslationLoader(config, registry);
+        final TranslationLoader loader = new DefaultTranslationLoader(config, registry);
         final TranslationService service = new TranslationServiceImpl(config, registry, loader);
 
         // Initialize provider

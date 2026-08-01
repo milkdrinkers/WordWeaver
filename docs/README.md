@@ -43,12 +43,14 @@
 - **Adventure 4+ Support** - Native integration for modern text components
 - **Java 8+ Compatibility** - Supports legacy and modern java versions
 - **Tested** - Comprehensive unit test coverage
-- **JSON** - Easy to edit translation files using Json with comments
+- **Multiple File Formats** - `.properties` support out of the box, with `.json`/`.jsonc` modules, or add your own format through optional parser modules
 - **Advanced Features** - Comes with optional advanced features like translation file extractor and updater
 
 ## 📦 Installation
 
-Add WordWeaver to your project with **Maven** or **Gradle**.
+Add WordWeaver to your project with **Maven** or **Gradle**. The core artifact ships with a `.properties` parser out of the box. To read `.json`/`.jsonc` files, add one of the optional JSON parser modules. Parser modules register themselves automatically once they are on the classpath.
+
+### Core
 
 <details>
 <summary>Gradle Kotlin DSL</summary>
@@ -69,15 +71,111 @@ dependencies {
 <summary>Maven</summary>
 
 ```xml
-<project>
-    <dependencies>
-        <dependency>
-            <groupId>io.github.milkdrinkers</groupId>
-            <artifactId>wordweaver</artifactId>
-            <version>VERSION</version>
-        </dependency>
-    </dependencies>
-</project>
+<dependency>
+    <groupId>io.github.milkdrinkers</groupId>
+    <artifactId>wordweaver</artifactId>
+    <version>VERSION</version>
+</dependency>
+```
+
+</details>
+
+### JSON/JSONC support *(Optional)*
+
+Pick **one** of the following, do not add both:
+
+- `wordweaver-json` - you provide the [GSON](https://github.com/google/gson) dependency yourself. Best when GSON is already on your classpath (*e.g. like on platforms like PaperMC*).
+- `wordweaver-json-shaded` - GSON comes bundled and relocated (*shaded*).
+
+<details>
+<summary>Gradle Kotlin DSL</summary>
+
+```kotlin
+dependencies {
+    implementation("io.github.milkdrinkers:wordweaver:VERSION")
+
+    // Option A, bring your own GSON
+    implementation("io.github.milkdrinkers:wordweaver-json:VERSION")
+    implementation("com.google.code.gson:gson:x.x.x")
+
+    // Option B, uses included GSON
+    implementation("io.github.milkdrinkers:wordweaver-json-shaded:VERSION")
+}
+```
+
+</details>
+
+<details>
+<summary>Maven</summary>
+
+```xml
+<!-- Option A, bring your own GSON -->
+<dependency>
+    <groupId>io.github.milkdrinkers</groupId>
+    <artifactId>wordweaver-json</artifactId>
+    <version>VERSION</version>
+</dependency>
+<dependency>
+    <groupId>com.google.code.gson</groupId>
+    <artifactId>gson</artifactId>
+    <version>x.x.x</version>
+</dependency>
+
+<!-- Option B, uses included GSON -->
+<dependency>
+    <groupId>io.github.milkdrinkers</groupId>
+    <artifactId>wordweaver-json-shaded</artifactId>
+    <version>VERSION</version>
+</dependency>
+```
+
+</details>
+
+### Shading
+
+Most users shade WordWeaver and its parser modules into their own jar. When you build a fat jar, you **must** merge service files so that every parser stays registered.
+
+<details>
+<summary>Gradle (Shadow)</summary>
+
+```kotlin
+tasks.shadowJar {
+    relocate("io.github.milkdrinkers.wordweaver", "yourpackage.wordweaver")
+
+    mergeServiceFiles()
+}
+```
+
+</details>
+
+<details>
+<summary>Maven (Shade)</summary>
+
+```xml
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-shade-plugin</artifactId>
+    <version>3.5.0</version>
+    <executions>
+        <execution>
+            <phase>package</phase>
+            <goals>
+                <goal>shade</goal>
+            </goals>
+        </execution>
+    </executions>
+    <configuration>
+        <relocations>
+            <relocation>
+                <pattern>io.github.milkdrinkers.wordweaver</pattern>
+                <shadedPattern>yourpackage.wordweaver</shadedPattern>
+            </relocation>
+        </relocations>
+        <transformers>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+        </transformers>
+    </configuration>
+</plugin>
 ```
 
 </details>
@@ -99,7 +197,7 @@ TranslationConfig config = TranslationConfig.builder()
 // Initialize WordWeaver
 Translation.initialize(config);
 
-// Now you can use translations
+// Use translations
 String message = Translation.of("messages.welcome");
 Component welcomeMessage = Translation.as("messages.welcome");
 List<String> rules = Translation.ofList("server.rules");

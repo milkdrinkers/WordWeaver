@@ -3,6 +3,7 @@ import java.time.Instant
 plugins {
     `java-library`
     alias(libs.plugins.shadow) apply false
+    alias(libs.plugins.publisher) apply false
 
     eclipse
     idea
@@ -18,7 +19,6 @@ tasks {
 
 subprojects {
     apply(plugin = "java-library")
-    apply(plugin = rootProject.libs.plugins.shadow.get().pluginId)
 
     project.version = rootProject.version
     project.description = rootProject.description

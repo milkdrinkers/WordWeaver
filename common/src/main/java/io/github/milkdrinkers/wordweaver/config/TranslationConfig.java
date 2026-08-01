@@ -1,6 +1,7 @@
 package io.github.milkdrinkers.wordweaver.config;
 
 import io.github.milkdrinkers.wordweaver.MissingTranslationHandler;
+import io.github.milkdrinkers.wordweaver.parser.TranslationParser;
 import net.kyori.adventure.key.InvalidKeyException;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.KeyPattern;
@@ -8,6 +9,8 @@ import net.kyori.adventure.text.Component;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.function.Function;
 
@@ -33,6 +36,7 @@ public class TranslationConfig {
     // Behavior
     private MissingTranslationHandler missingTranslationHandler;
     private Function<String, Component> componentConverter;
+    private final List<TranslationParser> parsers = new ArrayList<>();
 
     private TranslationConfig() {
         this.namespace = "";
@@ -102,6 +106,10 @@ public class TranslationConfig {
 
     public Function<String, Component> getComponentConverter() {
         return componentConverter;
+    }
+
+    public List<TranslationParser> getParsers() {
+        return parsers;
     }
 
     /**
@@ -241,6 +249,18 @@ public class TranslationConfig {
          */
         public Builder componentConverter(Function<String, Component> converter) {
             config.componentConverter = converter;
+            return this;
+        }
+
+        /**
+         * Add a parser explicitly, in addition to any auto discovered through the {@link java.util.ServiceLoader}.
+         *
+         * @param parser The parser to add
+         * @implNote An explicitly added parser overrides an auto discovered one for the same file extension. This is not required as the {@link java.util.ServiceLoader} will automatically discover any parsers on the classpath.
+         * @see TranslationParser
+         */
+        public Builder parser(TranslationParser parser) {
+            config.parsers.add(parser);
             return this;
         }
 

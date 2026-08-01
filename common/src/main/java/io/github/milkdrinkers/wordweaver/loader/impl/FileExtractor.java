@@ -1,22 +1,23 @@
 package io.github.milkdrinkers.wordweaver.loader.impl;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import io.github.milkdrinkers.wordweaver.Translation;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+/**
+ * Discovers and extracts bundle files shipped in the program resources.
+ */
 final class FileExtractor {
     @SuppressWarnings("FieldMayBeFinal")
     private static ClassLoader CLASS_LOADER = FileExtractor.class.getClassLoader();
@@ -25,14 +26,15 @@ final class FileExtractor {
     }
 
     /**
-     * Extracts Json files from JAR if they don't exist in the target directory
+     * Extracts resource files with a known extension from the resources if they don't exist in the target directory
      *
-     * @param outputDir   The directory where files should be extracted
-     * @param resourceDir Relative path to the subdirectory where language files are located in the resources directory.
+     * @param outputDir The directory where files should be extracted
+     * @param resourceDir Relative path to the subdirectory where bundle files are located in the resources directory.
+     * @param extensions The file extensions to extract (lowercase, without leading dot)
      * @return List of paths to extracted files
      * @throws IOException If an I/O error occurs
      */
-    public static List<Path> extractJsonResources(Path outputDir, Path resourceDir) throws IOException {
+    static List<Path> extractMissingResources(Path outputDir, Path resourceDir, Set<String> extensions) throws IOException {
         if (!Files.exists(outputDir))
             Files.createDirectories(outputDir);
 
@@ -40,13 +42,12 @@ final class FileExtractor {
             throw new IOException("The resource directory must be relative");
 
         final List<Path> extractedFiles = new ArrayList<>();
-        final List<Path> resourceFiles = findJsonResourceFiles(resourceDir);
+        final List<Path> resourceFiles = findResourceFiles(resourceDir, extensions);
 
         for (Path resourcePath : resourceFiles) {
-            final String fileName = resourcePath.getFileName().toString(); // Get just the filename
+            final String fileName = resourcePath.getFileName().toString();
             final Path targetFile = outputDir.resolve(fileName);
 
-            // Only extract if file doesn't exist
             if (Files.notExists(targetFile)) {
                 extractResourceFile(resourcePath, targetFile);
                 extractedFiles.add(targetFile);
@@ -57,13 +58,14 @@ final class FileExtractor {
     }
 
     /**
-     * Finds all Json resource files in the JAR
+     * Finds all resource files with a known extension in the resources
      *
-     * @param resourceDir Relative path to the subdirectory where language files are located in the resources directory.
-     * @return List of resource paths to Json files
+     * @param resourceDir Relative path to the subdirectory where bundle files are located in the resources directory.
+     * @param extensions  The file extensions to look for (lowercase, without leading dot)
+     * @return List of resource paths to matching files
      * @throws IOException If an I/O error occurs
      */
-    private static List<Path> findJsonResourceFiles(Path resourceDir) throws IOException {
+    static List<Path> findResourceFiles(Path resourceDir, Set<String> extensions) throws IOException {
         final List<Path> resources = new ArrayList<>();
 
         // Are we running from a JAR or from the filesystem?
@@ -72,20 +74,31 @@ final class FileExtractor {
             return resources; // Resource directory not found
 
         if (resourceUrl.getProtocol().equals("jar")) {
-            resources.addAll(findResourcesInJar(resourceDir)); // We're running from a JAR file
+            resources.addAll(findResourcesInJar(resourceDir, extensions)); // We're running from a JAR file
         } else {
-            resources.addAll(findResourcesInFileSystem(resourceDir)); // We're running from the filesystem (development mode)
+            resources.addAll(findResourcesInFileSystem(resourceDir, extensions)); // We're running from the filesystem (development mode)
         }
 
         return resources;
     }
 
     /**
-     * Finds Json/Jsonc resources when running from a JAR
+     * Opens a resource file as a stream, or null if it cannot be found.
      *
-     * @param resourceDir Relative path to the subdirectory where language files are located in the resources directory.
+     * @param resourcePath The resource path
+     * @return An input stream for the resource, or null
      */
-    private static List<Path> findResourcesInJar(Path resourceDir) throws IOException {
+    static InputStream openResource(Path resourcePath) {
+        return CLASS_LOADER.getResourceAsStream(resourcePath.toString().replace("\\", "/"));
+    }
+
+    /**
+     * Finds matching resources when running from a JAR
+     *
+     * @param resourceDir Relative path to the subdirectory where bundle files are located in the resources directory.
+     * @param extensions  The file extensions to look for (lowercase, without leading dot)
+     */
+    private static List<Path> findResourcesInJar(Path resourceDir, Set<String> extensions) throws IOException {
         final List<Path> resources = new ArrayList<>();
 
         // Get path to the JAR file
@@ -114,7 +127,7 @@ final class FileExtractor {
                 if (!entryName.startsWith(resourceDir.toString()))
                     continue;
 
-                if (entryName.endsWith(".json") || entryName.endsWith(".jsonc")) {
+                if (hasKnownExtension(entryName, extensions)) {
                     resources.add(Paths.get(entryName));
                 }
             }
@@ -124,11 +137,12 @@ final class FileExtractor {
     }
 
     /**
-     * Finds Json/Jsonc resources when running from the filesystem (development mode)
+     * Finds matching resources when running from the filesystem (development mode)
      *
-     * @param resourceDir Relative path to the subdirectory where language files are located in the resources directory.
+     * @param resourceDir Relative path to the subdirectory where bundle files are located in the resources directory.
+     * @param extensions  The file extensions to look for (lowercase, without leading dot)
      */
-    private static List<Path> findResourcesInFileSystem(Path resourceDir) throws IOException {
+    private static List<Path> findResourcesInFileSystem(Path resourceDir, Set<String> extensions) throws IOException {
         final List<Path> resources = new ArrayList<>();
 
         try {
@@ -138,8 +152,8 @@ final class FileExtractor {
             final URI uri = url.toURI();
             final Path resourcesPath = Paths.get(uri);
 
-            // Get all Json/Jsonc files in the directory
-            try (DirectoryStream<Path> stream = Files.newDirectoryStream(resourcesPath, path -> path.toString().endsWith(".json") || path.toString().endsWith(".jsonc"))) {
+            // Get all matching files in the directory
+            try (DirectoryStream<Path> stream = Files.newDirectoryStream(resourcesPath, path -> hasKnownExtension(path.getFileName().toString(), extensions))) {
                 for (Path path : stream) {
                     resources.add(resourceDir.resolve(path.getFileName())); // Convert to resource path format
                 }
@@ -155,7 +169,7 @@ final class FileExtractor {
      * Extracts a resource file to the specified target path
      */
     private static void extractResourceFile(Path resourcePath, Path targetFile) throws IOException {
-        try (final InputStream inputStream = CLASS_LOADER.getResourceAsStream(resourcePath.toString().replace("\\", "/"))) {
+        try (final InputStream inputStream = openResource(resourcePath)) {
             if (inputStream == null)
                 throw new IOException("Resource not found while extracting: " + resourcePath);
 
@@ -164,98 +178,13 @@ final class FileExtractor {
     }
 
     /**
-     * Updates existing Json files in the output directory by merging them with the corresponding resource files
-     *
-     * @param outputDir   The directory where files should be extracted
-     * @param resourceDir Relative path to the subdirectory where language files are located in the resources directory.
-     * @throws IOException If an I/O error occurs
+     * Returns whether the given file name ends with one of the known extensions.
      */
-    public static void updateFiles(Path outputDir, Path resourceDir) throws IOException {
-        if (!Files.exists(outputDir))
-            Files.createDirectories(outputDir);
+    private static boolean hasKnownExtension(String name, Set<String> extensions) {
+        final int dot = name.lastIndexOf('.');
+        if (dot < 0 || dot == name.length() - 1)
+            return false;
 
-        if (resourceDir.isAbsolute())
-            throw new IOException("The resource directory must be relative");
-
-        final List<Path> resourceFiles = findJsonResourceFiles(resourceDir);
-
-        for (Path resourcePath : resourceFiles) {
-            final String fileName = resourcePath.getFileName().toString(); // Get just the filename
-            final Path targetFile = outputDir.resolve(fileName);
-
-            if (!Files.exists(targetFile))
-                continue;
-
-            mergeJsonFiles(resourceDir.resolve(fileName), targetFile);
-        }
-    }
-
-    /**
-     * Merges two Json files by adding missing keys from origin to target
-     * while preserving target's existing content and maintaining origin's order.
-     *
-     * @param originPath Path to the origin Json file (with more keys)
-     * @param targetPath Path to the target Json file (with fewer keys)
-     * @throws IOException If an I/O error occurs
-     */
-    private static void mergeJsonFiles(Path originPath, Path targetPath) throws IOException {
-        // Read origin file from JAR
-        final InputStream originStream = CLASS_LOADER.getResourceAsStream(originPath.toString().replace("\\", "/"));
-        if (originStream == null)
-            throw new IOException("Resource not found when merging: " + originPath);
-        final Reader originReader = new InputStreamReader(originStream);
-
-        // Read target file from filesystem
-        final String targetContent = new String(Files.readAllBytes(targetPath));
-
-        // Parse Json
-        final JsonObject originJson = JsonParser.parseReader(originReader).getAsJsonObject();
-        final JsonObject targetJson = JsonParser.parseString(targetContent).getAsJsonObject();
-
-        // Merge preserving order
-        final JsonObject mergedJson = mergeJsonObjects(originJson, targetJson);
-
-        Files.write(targetPath, FileReader.GSON.toJson(mergedJson).getBytes());
-    }
-
-    /**
-     * Recursively merges Json objects, adding missing keys from origin to target while preserving target's existing values and maintaining origin's order.
-     *
-     * @param origin The original Json object
-     * @param target The user modified Json object
-     * @return The merged Json object
-     */
-    private static JsonObject mergeJsonObjects(JsonObject origin, JsonObject target) {
-        final Set<String> processedKeys = new HashSet<>();
-        final JsonObject result = new JsonObject();
-
-        // Add all keys from origin in original order
-        for (Map.Entry<String, JsonElement> entry : origin.entrySet()) {
-            final String key = entry.getKey();
-            processedKeys.add(key);
-
-            if (target.has(key)) { // Key exists in both, check if deep merge required
-                final JsonElement originValue = entry.getValue();
-                final JsonElement targetValue = target.get(key);
-
-                if (originValue.isJsonObject() && targetValue.isJsonObject()) {
-                    result.add(key, mergeJsonObjects(originValue.getAsJsonObject(), targetValue.getAsJsonObject())); // Recursively merge nested objects
-                } else {
-                    result.add(key, targetValue); // Keep target's value
-                }
-            } else {
-                result.add(key, entry.getValue()); // Key exists only in origin, add to target
-            }
-        }
-
-        // Add remaining keys from target that are not present in origin
-        for (Map.Entry<String, JsonElement> entry : target.entrySet()) {
-            final String key = entry.getKey();
-            if (!processedKeys.contains(key)) {
-                result.add(key, entry.getValue());
-            }
-        }
-
-        return result;
+        return extensions.contains(name.substring(dot + 1).toLowerCase());
     }
 }

@@ -1,6 +1,5 @@
 import com.vanniktech.maven.publish.JavaLibrary
 import com.vanniktech.maven.publish.JavadocJar
-import org.gradle.internal.extensions.stdlib.capitalized
 
 plugins {
     alias(libs.plugins.publisher)
@@ -8,16 +7,17 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.slf4j.api)
-    compileOnlyApi(libs.adventure)
+    api(projects.common)
+    compileOnly(libs.gson)
 
+    testImplementation(libs.gson)
     testImplementation(libs.slf4j.simple)
 }
 
 mavenPublishing {
     coordinates(
         groupId = "io.github.milkdrinkers",
-        artifactId = project.rootProject.name.lowercase(),
+        artifactId = "wordweaver-json",
         version = version.toString().let { originalVersion ->
             if (!originalVersion.contains("-SNAPSHOT"))
                 originalVersion
@@ -27,8 +27,8 @@ mavenPublishing {
     )
 
     pom {
-        name.set(rootProject.name.capitalized())
-        description.set(rootProject.description.orEmpty())
+        name.set("WordWeaver JSON")
+        description.set("JSON/JSONC translation parser for WordWeaver. Requires a GSON dependency to be provided by the consumer.")
         url.set("https://github.com/milkdrinkers/WordWeaver")
         inceptionYear.set("2025")
 
@@ -57,16 +57,13 @@ mavenPublishing {
     }
 
     configure(JavaLibrary(
-        javadocJar = JavadocJar.None(), // We want to use our own javadoc jar
+        javadocJar = JavadocJar.None(),
     ))
 
-    // Publish to Maven Central
     publishToMavenCentral(automaticRelease = true)
-
-    // Sign all publications
     signAllPublications()
 }
 
 signing {
-    isRequired = false // Skip signing if no credentials are provided, e.g. for local publishing
+    isRequired = false
 }

@@ -1,23 +1,44 @@
 import com.vanniktech.maven.publish.JavaLibrary
 import com.vanniktech.maven.publish.JavadocJar
-import org.gradle.internal.extensions.stdlib.capitalized
 
 plugins {
+    alias(libs.plugins.shadow)
     alias(libs.plugins.publisher)
     signing
 }
 
-dependencies {
-    implementation(libs.slf4j.api)
-    compileOnlyApi(libs.adventure)
+val shade: Configuration by configurations.creating
 
-    testImplementation(libs.slf4j.simple)
+dependencies {
+    api(projects.common)
+
+    shade(projects.parsers.json) {
+        isTransitive = false
+    }
+    shade(libs.gson)
+}
+
+tasks.shadowJar {
+    configurations = listOf(shade)
+    archiveClassifier.set("")
+    relocate("com.google.gson", "io.github.milkdrinkers.wordweaver.lib.gson")
+    relocate("com.google.errorprone", "io.github.milkdrinkers.wordweaver.lib.errorprone")
+
+    mergeServiceFiles()
+
+    minimize {
+        exclude(project(":parsers:json"))
+    }
+}
+
+tasks.build {
+    dependsOn(tasks.shadowJar)
 }
 
 mavenPublishing {
     coordinates(
         groupId = "io.github.milkdrinkers",
-        artifactId = project.rootProject.name.lowercase(),
+        artifactId = "wordweaver-json-shaded",
         version = version.toString().let { originalVersion ->
             if (!originalVersion.contains("-SNAPSHOT"))
                 originalVersion
@@ -27,8 +48,8 @@ mavenPublishing {
     )
 
     pom {
-        name.set(rootProject.name.capitalized())
-        description.set(rootProject.description.orEmpty())
+        name.set("WordWeaver JSON (Shaded)")
+        description.set("JSON/JSONC translation parser for WordWeaver with GSON shaded and relocated.")
         url.set("https://github.com/milkdrinkers/WordWeaver")
         inceptionYear.set("2025")
 
@@ -57,16 +78,13 @@ mavenPublishing {
     }
 
     configure(JavaLibrary(
-        javadocJar = JavadocJar.None(), // We want to use our own javadoc jar
+        javadocJar = JavadocJar.None(),
     ))
 
-    // Publish to Maven Central
     publishToMavenCentral(automaticRelease = true)
-
-    // Sign all publications
     signAllPublications()
 }
 
 signing {
-    isRequired = false // Skip signing if no credentials are provided, e.g. for local publishing
+    isRequired = false
 }
