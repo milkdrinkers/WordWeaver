@@ -1,7 +1,5 @@
 package io.github.milkdrinkers.wordweaver.loader.impl;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,15 +7,19 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FileExtractorTest {
+    private static final Set<String> EXTENSIONS = new HashSet<>(Arrays.asList("json", "jsonc"));
+
     @TempDir
     private Path tempDir;
     private Path outputDir;
@@ -38,9 +40,9 @@ class FileExtractorTest {
      * Test that files are properly extracted when they don't exist
      */
     @Test
-    void shouldExtractJsonResources() throws IOException {
+    void shouldExtractResources() throws IOException {
         // Extract resources
-        List<Path> extractedFiles = FileExtractor.extractJsonResources(outputDir, Path.of("lang"));
+        List<Path> extractedFiles = FileExtractor.extractMissingResources(outputDir, Path.of("lang"), EXTENSIONS);
 
         // Verify extracted files
         assertEquals(2, extractedFiles.size());
@@ -60,7 +62,7 @@ class FileExtractorTest {
         Files.writeString(existingFile2, "{\"existing\":\"content\"}");
 
         // Extract resources
-        List<Path> extractedFiles = FileExtractor.extractJsonResources(outputDir, Path.of("lang"));
+        List<Path> extractedFiles = FileExtractor.extractMissingResources(outputDir, Path.of("lang"), EXTENSIONS);
 
         // Verify no files were extracted
         assertEquals(0, extractedFiles.size());
@@ -68,62 +70,8 @@ class FileExtractorTest {
         // Verify existing file content wasn't changed
         String content1 = Files.readString(existingFile1);
         assertEquals("{\"existing\":\"content\"}", content1);
-        String content2 = Files.readString(existingFile1);
+        String content2 = Files.readString(existingFile2);
         assertEquals("{\"existing\":\"content\"}", content2);
-    }
-
-    /**
-     * Test merging JSON files with different structures
-     */
-    @Test
-    void shouldMergeJsonFiles() throws Exception {
-        // Create original JSON file with structure
-        String originJson = "{\"key1\":\"value1\",\"section\":{\"subkey1\":\"subvalue1\",\"subkey2\":\"subvalue2\"},\"key2\":\"value2\"}";
-        Path originPath = tempDir.resolve("origin.json");
-        Files.writeString(originPath, originJson);
-
-        // Create target JSON file with modified values and missing keys
-        String targetJson = "{\"key1\":\"modified1\",\"section\":{\"subkey1\":\"modified_subvalue1\"}}";
-        Path targetPath = tempDir.resolve("target.json");
-        Files.writeString(targetPath, targetJson);
-
-        // Use reflection to call mergeJsonObjects method
-        Method mergeMethod = FileExtractor.class.getDeclaredMethod("mergeJsonObjects", JsonObject.class, JsonObject.class);
-        mergeMethod.setAccessible(true);
-
-        JsonObject origin = JsonParser.parseString(originJson).getAsJsonObject();
-        JsonObject target = JsonParser.parseString(targetJson).getAsJsonObject();
-
-        JsonObject result = (JsonObject) mergeMethod.invoke(null, origin, target);
-
-        // Verify result has all keys
-        assertTrue(result.has("key1"));
-        assertTrue(result.has("key2"));
-        assertTrue(result.has("section"));
-
-        // Verify values from target were preserved
-        assertEquals("modified1", result.get("key1").getAsString());
-
-        // Verify missing keys from origin were added
-        assertEquals("value2", result.get("key2").getAsString());
-
-        // Verify nested objects were merged properly
-        JsonObject section = result.getAsJsonObject("section");
-        assertEquals("modified_subvalue1", section.get("subkey1").getAsString());
-        assertEquals("subvalue2", section.get("subkey2").getAsString());
-    }
-
-    /**
-     * Test updating files with missing keys
-     */
-    @Test
-    void shouldUpdateFilesWithMissingKeys() throws Exception {
-        // Create existing file with partial content
-        Path existingFile = outputDir.resolve("en_US.jsonc");
-        Files.writeString(existingFile, "{\"greeting\":\"Hello\"}");
-
-        // Call updateFiles method
-        FileExtractor.updateFiles(outputDir, Path.of("lang"));
     }
 
     /**
@@ -149,12 +97,7 @@ class FileExtractorTest {
         classLoaderField.setAccessible(true);
         classLoaderField.set(null, testLoader);
 
-        // Call method via reflection
-        Method findResourcesMethod = FileExtractor.class.getDeclaredMethod("findResourcesInFileSystem", Path.class);
-        findResourcesMethod.setAccessible(true);
-
-        @SuppressWarnings("unchecked")
-        List<Path> resources = (List<Path>) findResourcesMethod.invoke(null, Path.of("lang"));
+        List<Path> resources = FileExtractor.findResourceFiles(Path.of("lang"), EXTENSIONS);
 
         // Verify both files were found
         assertEquals(2, resources.size());

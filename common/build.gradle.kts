@@ -11,6 +11,7 @@ dependencies {
     implementation(libs.slf4j.api)
     compileOnlyApi(libs.adventure)
 
+    testImplementation(libs.adventure)
     testImplementation(libs.slf4j.simple)
 }
 
