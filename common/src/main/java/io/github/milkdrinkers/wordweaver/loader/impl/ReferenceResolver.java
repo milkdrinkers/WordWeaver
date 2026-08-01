@@ -61,7 +61,8 @@ final class ReferenceResolver {
 
             for (String value : entry.getValues()) {
                 final StringBuffer processedValue = new StringBuffer();
-                foundAnyKey = replaceKeysInString(value, processedValue, original, results, depth + 1);
+                if (replaceKeysInString(value, processedValue, original, results, depth + 1))
+                    foundAnyKey = true;
                 processedValues.add(processedValue.toString());
             }
 
