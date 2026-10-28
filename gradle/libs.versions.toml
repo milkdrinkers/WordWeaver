@@ -6,7 +6,7 @@ slf4j = "[2,3)"
 annotations = "org.jetbrains:annotations:26.1.0"
 adventure-api = { module = "net.kyori:adventure-api", version.ref = "adventure" }
 adventure-minimessage = { module = "net.kyori:adventure-text-minimessage", version.ref = "adventure" }
-gson = "com.google.code.gson:gson:2.14.0"
+gson = "com.google.code.gson:gson:2.15.0"
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 junit-bom = "org.junit:junit-bom:6.1.3"
